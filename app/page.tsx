@@ -1,51 +1,32 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { StreamCard } from "@/components/StreamCard";
-import { AnimatedGrid } from "@/components/AnimatedGrid";
+import { Footer } from "@/components/Footer";
+import Aurora from "@/components/Aurora";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 
 export default function Home() {
-  // Временные данные для демонстрации
-  const streams = [
-    { code: "UUEE", city: "Москва (Шереметьево)", listeners: 12, isLive: true },
-    { code: "ULLI", city: "Санкт-Петербург", listeners: 4, isLive: true },
-    { code: "UNNT", city: "Новосибирск", listeners: 7, isLive: true },
-    { code: "USSS", city: "Екатеринбург", listeners: 3, isLive: false },
-    { code: "UUWW", city: "Москва (Внуково)", listeners: 8, isLive: true },
-    { code: "UUDD", city: "Москва (Домодедово)", listeners: 15, isLive: true },
-  ];
-
   return (
     <AudioPlayerProvider>
-      <div className="relative min-h-screen bg-background">
-        {/* Animated Background Grid */}
-        <AnimatedGrid />
+      <div className="relative min-h-screen bg-background flex flex-col">
+        {/* Aurora Background */}
+        <Aurora
+          colorStops={["#0B1628", "#1E3A5F", "#3B5998"]}
+          blend={0.6}
+          amplitude={1.4}
+          speed={1.2}
+        />
 
         {/* Content */}
-        <div className="relative z-10">
+        <div className="relative z-10 flex flex-col flex-1">
           <Header />
 
-          <main>
-            <Hero />
-
-            {/* Stream Cards */}
-            <section className="mx-auto max-w-7xl px-6 pb-20 pt-12">
-              <h2 className="mb-8 text-center text-2xl font-bold text-foreground">
-                Доступные трансляции
-              </h2>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {streams.map((stream) => (
-                  <StreamCard
-                    key={stream.code}
-                    code={stream.code}
-                    city={stream.city}
-                    listeners={stream.listeners}
-                    isLive={stream.isLive}
-                  />
-                ))}
-              </div>
+          <main className="flex-1">
+            <section className="px-6 py-20 min-h-[calc(100vh-160px)] flex items-center">
+              <Hero />
             </section>
           </main>
+
+          <Footer />
         </div>
       </div>
     </AudioPlayerProvider>

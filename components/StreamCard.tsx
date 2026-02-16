@@ -1,27 +1,63 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Plane, Circle, Volume2, Music, Pause, Play } from "lucide-react";
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { Radio, Circle, Volume2, Music } from "lucide-react";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { fetchStreamUrl } from "@/lib/streamUtils";
+import { motion, AnimatePresence } from "motion/react";
+import { WeatherWidget } from "./WeatherWidget";
 
 interface StreamCardProps {
   code: string;
   city: string;
   listeners: number;
   isLive: boolean;
+  radioScannerCode?: string; // Code for radioscanner.pro (e.g., 'ulli')
   atcStreamUrl?: string;
   ambientMusicUrl?: string;
 }
 
-export function StreamCard({ code, city, listeners, isLive, atcStreamUrl, ambientMusicUrl }: StreamCardProps) {
+export interface StreamCardRef {
+  play: () => Promise<void>;
+  pause: () => void;
+  isPlaying: boolean;
+  isLoading: boolean;
+}
+
+export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, city, listeners, isLive, radioScannerCode, atcStreamUrl, ambientMusicUrl }, ref) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [atcVolume, setAtcVolume] = useState(70);
   const [musicVolume, setMusicVolume] = useState(30);
+  const [dynamicStreamUrl, setDynamicStreamUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [liveListeners, setLiveListeners] = useState(0);
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
 
   const atcAudioRef = useRef<HTMLAudioElement>(null);
   const musicAudioRef = useRef<HTMLAudioElement>(null);
 
   const { activeStreamId, setActiveStream } = useAudioPlayer();
+
+  // Handle audio errors
+  useEffect(() => {
+    const atcAudio = atcAudioRef.current;
+    if (!atcAudio) return;
+
+    const handleError = (e: Event) => {
+      console.error('Audio error:', e);
+      const audio = e.target as HTMLAudioElement;
+      if (audio.error) {
+        console.error('Audio error code:', audio.error.code);
+        console.error('Audio error message:', audio.error.message);
+        setError(`Ошибка воспроизведения: ${audio.error.message}`);
+      }
+      setIsPlaying(false);
+    };
+
+    atcAudio.addEventListener('error', handleError);
+    return () => atcAudio.removeEventListener('error', handleError);
+  }, []);
 
   // Stop playback if another card becomes active
   useEffect(() => {
@@ -44,112 +80,236 @@ export function StreamCard({ code, city, listeners, isLive, atcStreamUrl, ambien
     }
   }, [musicVolume]);
 
-  const handlePlayToggle = () => {
+  // Auto-restart music if it stops
+  useEffect(() => {
+    const musicAudio = musicAudioRef.current;
+    if (!musicAudio) return;
+
+    const handleMusicEnded = () => {
+      if (isPlaying && ambientMusicUrl) {
+        console.log('Music ended, restarting...');
+        musicAudio.currentTime = 0;
+        musicAudio.play().catch(err => {
+          console.error('Failed to restart music:', err);
+        });
+      }
+    };
+
+    const handleMusicError = () => {
+      if (isPlaying && ambientMusicUrl) {
+        console.log('Music error, attempting to restart...');
+        setTimeout(() => {
+          musicAudio.load();
+          musicAudio.play().catch(err => {
+            console.error('Failed to restart music after error:', err);
+          });
+        }, 1000);
+      }
+    };
+
+    musicAudio.addEventListener('ended', handleMusicEnded);
+    musicAudio.addEventListener('error', handleMusicError);
+
+    return () => {
+      musicAudio.removeEventListener('ended', handleMusicEnded);
+      musicAudio.removeEventListener('error', handleMusicError);
+    };
+  }, [isPlaying, ambientMusicUrl]);
+
+  // Listener tracking - send heartbeat and fetch count
+  useEffect(() => {
+    let heartbeatInterval: NodeJS.Timeout;
+    let countInterval: NodeJS.Timeout;
+
     if (isPlaying) {
-      // Pause both
-      atcAudioRef.current?.pause();
-      musicAudioRef.current?.pause();
-      setIsPlaying(false);
-      setActiveStream(null);
+      // Send initial heartbeat
+      fetch('/api/listeners', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId })
+      }).catch(err => console.error('Failed to send heartbeat:', err));
+
+      // Send heartbeat every 20 seconds
+      heartbeatInterval = setInterval(() => {
+        fetch('/api/listeners', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId })
+        }).catch(err => console.error('Failed to send heartbeat:', err));
+      }, 20000);
+
+      // Update listener count every 10 seconds
+      countInterval = setInterval(() => {
+        fetch('/api/listeners')
+          .then(res => res.json())
+          .then(data => setLiveListeners(data.listeners))
+          .catch(err => console.error('Failed to fetch listener count:', err));
+      }, 10000);
+
+      // Initial count fetch
+      fetch('/api/listeners')
+        .then(res => res.json())
+        .then(data => setLiveListeners(data.listeners))
+        .catch(err => console.error('Failed to fetch listener count:', err));
     } else {
-      // Play both
-      atcAudioRef.current?.play();
-      musicAudioRef.current?.play();
-      setIsPlaying(true);
-      setActiveStream(code);
+      // Remove listener when stopped
+      fetch('/api/listeners', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId })
+      }).catch(err => console.error('Failed to remove listener:', err));
+    }
+
+    return () => {
+      clearInterval(heartbeatInterval);
+      clearInterval(countInterval);
+
+      // Cleanup on unmount
+      if (isPlaying) {
+        fetch('/api/listeners', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId })
+        }).catch(err => console.error('Failed to remove listener:', err));
+      }
+    };
+  }, [isPlaying, sessionId]);
+
+  const handlePlay = async () => {
+    // If we have a radioScannerCode, use proxy URL
+    if (radioScannerCode && !dynamicStreamUrl) {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Use our proxy endpoint instead of direct URL
+        const proxyUrl = `/api/stream-proxy/${radioScannerCode.toLowerCase()}`;
+        console.log('Using proxy URL:', proxyUrl);
+        setDynamicStreamUrl(proxyUrl);
+
+        // Wait a moment for the audio element to update
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Play both
+        if (atcAudioRef.current) {
+          console.log('Setting audio source to proxy:', proxyUrl);
+          atcAudioRef.current.src = proxyUrl;
+          atcAudioRef.current.load(); // Explicitly load the stream
+
+          try {
+            await atcAudioRef.current.play();
+            console.log('ATC stream playing successfully');
+          } catch (playError) {
+            console.error('Error playing ATC stream:', playError);
+            throw new Error(`Ошибка воспроизведения: ${playError instanceof Error ? playError.message : 'Неизвестная ошибка'}`);
+          }
+        }
+
+        // Try to play music (optional)
+        if (musicAudioRef.current && ambientMusicUrl) {
+          try {
+            await musicAudioRef.current.play();
+            console.log('Music stream playing successfully');
+          } catch (musicError) {
+            console.warn('Music stream failed to play:', musicError);
+            // Music is optional, so we don't throw here
+          }
+        }
+
+        setIsPlaying(true);
+        setActiveStream(code);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Не удалось загрузить поток';
+        setError(errorMessage);
+        console.error('Error loading stream:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      // Use existing URL (either dynamic or static)
+      try {
+        await atcAudioRef.current?.play();
+        if (musicAudioRef.current && ambientMusicUrl) {
+          await musicAudioRef.current?.play();
+        }
+        setIsPlaying(true);
+        setActiveStream(code);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Ошибка воспроизведения';
+        setError(errorMessage);
+        console.error('Error playing stream:', err);
+      }
     }
   };
 
+  const handlePause = () => {
+    atcAudioRef.current?.pause();
+    musicAudioRef.current?.pause();
+    setIsPlaying(false);
+    setActiveStream(null);
+  };
+
+  // Expose play/pause methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    play: handlePlay,
+    pause: handlePause,
+    isPlaying,
+    isLoading,
+  }));
+
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl border bg-card transition-all duration-500 ${
-        isPlaying
+      className={`group relative overflow-hidden rounded-3xl border bg-card transition-all duration-500 ${
+        isLoading
+          ? 'border-primary shadow-2xl shadow-primary/20 animate-pulse'
+          : isPlaying
           ? 'border-primary shadow-2xl shadow-primary/20'
-          : 'border-border hover:-translate-y-2 hover:border-primary hover:shadow-2xl hover:shadow-black/30'
+          : 'border-border hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-black/20'
       }`}
     >
-      {/* Pulsating Rings for Active State */}
-      {isPlaying && (
-        <>
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute left-1/2 top-[88px] -translate-x-1/2">
-              <div className="pulse-ring pulse-ring-1" />
-              <div className="pulse-ring pulse-ring-2" />
-              <div className="pulse-ring pulse-ring-3" />
-            </div>
-          </div>
-          <style jsx>{`
-            .pulse-ring {
-              position: absolute;
-              border: 2px solid rgba(59, 130, 246, 0.4);
-              border-radius: 50%;
-              animation: pulseRing 3s ease-out infinite;
-            }
-
-            .pulse-ring-1 {
-              width: 60px;
-              height: 60px;
-              margin-left: -30px;
-              margin-top: -30px;
-              animation-delay: 0s;
-            }
-
-            .pulse-ring-2 {
-              width: 60px;
-              height: 60px;
-              margin-left: -30px;
-              margin-top: -30px;
-              animation-delay: 1s;
-            }
-
-            .pulse-ring-3 {
-              width: 60px;
-              height: 60px;
-              margin-left: -30px;
-              margin-top: -30px;
-              animation-delay: 2s;
-            }
-
-            @keyframes pulseRing {
-              0% {
-                transform: scale(0.8);
-                opacity: 1;
-              }
-              50% {
-                transform: scale(2);
-                opacity: 0.5;
-              }
-              100% {
-                transform: scale(3);
-                opacity: 0;
-              }
-            }
-          `}</style>
-        </>
-      )}
-
-      <div className="relative p-8">
-        <div className="mb-6 flex justify-center">
-          <Plane
-            className={`h-10 w-10 transition-all duration-500 ${
-              isPlaying ? 'text-primary scale-110' : 'text-primary'
-            }`}
+      <div className="relative p-10">
+        <div className="mb-8 flex justify-center">
+          <Radio
+            className={`h-12 w-12 text-primary animate-pulse`}
+            style={{ animationDuration: '3s' }}
             strokeWidth={1.5}
           />
         </div>
 
-        <h3 className="mb-2 text-center text-xl font-bold text-foreground">
+        <h3 className="mb-3 text-center text-2xl font-bold text-foreground">
           {code}
         </h3>
 
-        <p className="mb-6 text-center text-sm text-muted">
+        <p className="mb-2 text-center text-base text-muted">
           {city}
         </p>
 
+        {/* Radio Frequency - Always visible */}
+        <div className="mb-4 text-center">
+          <span className="font-mono text-xs font-semibold text-primary">118.1 MHz</span>
+        </div>
+
+        {/* Live message when playing */}
+        <AnimatePresence>
+          {isPlaying && (
+            <motion.p
+              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+              animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
+              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="text-center text-xs leading-relaxed text-muted/70 overflow-hidden"
+            >
+              Ты на частоте неба. Не подкаст. Не запись.<br />
+              Живой эфир между землёй и облаками.
+            </motion.p>
+          )}
+        </AnimatePresence>
+
         <div className="mb-6 flex items-center justify-between text-sm">
           <div className="flex items-center gap-2 text-muted">
-            <Circle className="h-2 w-2 fill-current" />
-            <span>{listeners}</span>
+            <Circle className={`h-2 w-2 fill-current ${liveListeners > 0 ? 'text-success animate-pulse' : ''}`}
+                    style={liveListeners > 0 ? { animationDuration: '2s' } : {}} />
+            <span>{liveListeners}</span>
           </div>
 
           {isLive && (
@@ -245,42 +405,41 @@ export function StreamCard({ code, city, listeners, isLive, atcStreamUrl, ambien
           </div>
         </div>
 
-        {/* Play/Pause Button */}
-        <button
-          onClick={handlePlayToggle}
-          className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ${
-            isPlaying
-              ? 'bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90'
-              : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
-          }`}
-        >
-          {isPlaying ? (
-            <>
-              <Pause className="h-4 w-4" strokeWidth={2} />
-              Остановить
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4" strokeWidth={2} />
-              Слушать
-            </>
-          )}
-        </button>
+        {/* Error Message */}
+        {error && (
+          <div className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
+            {error}
+          </div>
+        )}
+
+        {/* Inactive state message */}
+        {!isPlaying && !isLoading && (
+          <div className="text-center text-xs text-muted/60 leading-relaxed pt-2">
+            Они говорят. Ты можешь слышать.
+          </div>
+        )}
+
+        {/* Weather Widget */}
+        <WeatherWidget show={isPlaying} />
       </div>
 
       {/* Hidden Audio Elements */}
       <audio
         ref={atcAudioRef}
-        src={atcStreamUrl || '/demo-atc.mp3'}
-        loop
-        preload="metadata"
+        src={dynamicStreamUrl || atcStreamUrl}
+        preload="none"
+        crossOrigin="anonymous"
       />
-      <audio
-        ref={musicAudioRef}
-        src={ambientMusicUrl || '/demo-ambient.mp3'}
-        loop
-        preload="metadata"
-      />
+      {ambientMusicUrl && (
+        <audio
+          ref={musicAudioRef}
+          src={ambientMusicUrl}
+          loop
+          preload="metadata"
+        />
+      )}
     </div>
   );
-}
+});
+
+StreamCard.displayName = 'StreamCard';

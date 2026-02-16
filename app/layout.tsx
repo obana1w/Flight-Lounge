@@ -15,7 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FlightLounge — Слушайте авиационные переговоры в реальном времени",
+  title: "FLY LOUNGE — На частоте неба",
   description: "Премиум минималистичный интерфейс для прослушивания переговоров диспетчеров и пилотов в реальном времени. Москва, Санкт-Петербург, Новосибирск.",
 };
 
