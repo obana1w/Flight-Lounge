@@ -465,7 +465,7 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
           ref={musicAudioRef}
           src={ambientMusicUrl}
           loop
-          preload="metadata"
+          preload="none"
         />
       )}
     </div>
