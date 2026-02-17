@@ -7,7 +7,7 @@ import { RefObject } from "react";
 import { Info, Radio } from "lucide-react";
 
 interface HeroProps {
-  streamCardRef: RefObject<StreamCardRef>;
+  streamCardRef: RefObject<StreamCardRef | null>;
   onOpenContextModal: () => void;
   onOpenRadioModal: () => void;
 }

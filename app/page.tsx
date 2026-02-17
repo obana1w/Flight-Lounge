@@ -13,7 +13,7 @@ import { StreamCardRef } from "@/components/StreamCard";
 export default function Home() {
   const [isContextModalOpen, setIsContextModalOpen] = useState(false);
   const [isRadioModalOpen, setIsRadioModalOpen] = useState(false);
-  const streamCardRef = useRef<StreamCardRef>(null);
+  const streamCardRef = useRef<StreamCardRef | null>(null);
 
   const handleStartListening = async () => {
     await streamCardRef.current?.play();
