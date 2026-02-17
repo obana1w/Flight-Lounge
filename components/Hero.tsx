@@ -17,7 +17,7 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
   return (
     <>
       <div className="w-full max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-center lg:items-center">
+        <div className="flex flex-col lg:flex-row gap-8 sm:gap-10 lg:gap-16 items-center lg:items-center">
           {/* Left Side - Text Content */}
           <div className="flex-1 space-y-8">
             <div className="space-y-6">
