@@ -20,8 +20,38 @@ export default function Home() {
     setIsContextModalOpen(false);
   };
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'FLY LOUNGE',
+    alternateName: 'Fly Lounge',
+    description: 'Медитация на частоте десяти тысяч метров. Голоса пилотов и диспетчеров в реальном времени — спокойно и глубоко.',
+    url: 'https://flylounge.ru',
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'Web',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'RUB',
+    },
+    provider: {
+      '@type': 'Organization',
+      name: 'FLY LOUNGE',
+      email: 'cloud@flylounge.ru',
+    },
+    audience: {
+      '@type': 'Audience',
+      audienceType: 'Aviation enthusiasts, meditation practitioners, ambient music lovers',
+    },
+    keywords: 'авиация, радио, ATC, диспетчеры, пилоты, ambient, lofi, медитация, авиационная связь',
+  };
+
   return (
     <AudioPlayerProvider>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="relative min-h-screen bg-background flex flex-col">
         {/* Aurora Background */}
         <Aurora
