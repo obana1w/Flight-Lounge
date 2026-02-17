@@ -190,7 +190,7 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
         // Wait a moment for the audio element to update
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // Play both
+        // Play ATC stream (critical)
         if (atcAudioRef.current) {
           console.log('Setting audio source to proxy:', proxyUrl);
           atcAudioRef.current.src = proxyUrl;
@@ -199,41 +199,48 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
           try {
             await atcAudioRef.current.play();
             console.log('ATC stream playing successfully');
+
+            // Set playing state immediately after ATC starts
+            setIsPlaying(true);
+            setActiveStream(code);
+            setIsLoading(false);
           } catch (playError) {
             console.error('Error playing ATC stream:', playError);
             throw new Error(`Ошибка воспроизведения: ${playError instanceof Error ? playError.message : 'Неизвестная ошибка'}`);
           }
         }
 
-        // Try to play music (optional)
+        // Try to play music in background (optional, non-blocking)
         if (musicAudioRef.current && ambientMusicUrl) {
-          try {
-            await musicAudioRef.current.play();
+          musicAudioRef.current.play().then(() => {
             console.log('Music stream playing successfully');
-          } catch (musicError) {
+          }).catch((musicError) => {
             console.warn('Music stream failed to play:', musicError);
             // Music is optional, so we don't throw here
-          }
+          });
         }
-
-        setIsPlaying(true);
-        setActiveStream(code);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Не удалось загрузить поток';
         setError(errorMessage);
         console.error('Error loading stream:', err);
-      } finally {
         setIsLoading(false);
       }
     } else {
       // Use existing URL (either dynamic or static)
       try {
-        await atcAudioRef.current?.play();
-        if (musicAudioRef.current && ambientMusicUrl) {
-          await musicAudioRef.current?.play();
+        if (atcAudioRef.current) {
+          await atcAudioRef.current.play();
+          // Set playing state immediately after ATC starts
+          setIsPlaying(true);
+          setActiveStream(code);
         }
-        setIsPlaying(true);
-        setActiveStream(code);
+
+        // Try to play music in background (optional, non-blocking)
+        if (musicAudioRef.current && ambientMusicUrl) {
+          musicAudioRef.current.play().catch((musicError) => {
+            console.warn('Music stream failed to play:', musicError);
+          });
+        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Ошибка воспроизведения';
         setError(errorMessage);

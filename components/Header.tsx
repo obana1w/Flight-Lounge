@@ -67,7 +67,12 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="hidden md:flex items-center gap-4"
         >
-          <button className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-4 lg:px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 whitespace-nowrap">
+          <a
+            href="https://dalink.to/flylounge"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-4 lg:px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 whitespace-nowrap"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -83,7 +88,7 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
               <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
             </svg>
             Поддержать
-          </button>
+          </a>
         </motion.div>
 
         {/* Mobile Menu Button */}
@@ -124,7 +129,12 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
             >
               Радиолюбителям
             </button>
-            <button className="group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all">
+            <a
+              href="https://dalink.to/flylounge"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -139,7 +149,7 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
               </svg>
               Поддержать
-            </button>
+            </a>
           </nav>
         </motion.div>
       )}

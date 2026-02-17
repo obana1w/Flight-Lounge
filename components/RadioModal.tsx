@@ -133,10 +133,56 @@ export function RadioModal({ isOpen, onClose }: RadioModalProps) {
                       }}
                       className="text-sm sm:text-base md:text-lg leading-relaxed text-foreground/80 text-center whitespace-pre-line"
                     >
-                      {text}
+                      {text.includes('cloud@flylounge.ru') ? (
+                        <>
+                          Если интересно — пишите:{' '}
+                          <a
+                            href="mailto:cloud@flylounge.ru"
+                            className="text-primary hover:text-primary/80 transition-colors font-medium"
+                          >
+                            cloud@flylounge.ru
+                          </a>
+                        </>
+                      ) : (
+                        text
+                      )}
                     </motion.p>
                   ))}
                 </div>
+
+                {/* Contact Button */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.5,
+                    delay: 0.1 + paragraphs.length * 0.1,
+                    ease: "easeOut"
+                  }}
+                  className="mt-8 sm:mt-12 flex justify-center"
+                >
+                  <a
+                    href="mailto:cloud@flylounge.ru"
+                    className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="transition-transform group-hover:scale-110"
+                    >
+                      <rect width="20" height="16" x="2" y="4" rx="2" />
+                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                    </svg>
+                    Связь с нами
+                  </a>
+                </motion.div>
               </div>
             </motion.div>
           </div>

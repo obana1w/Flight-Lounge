@@ -89,7 +89,7 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
                 listeners={0}
                 isLive={true}
                 radioScannerCode="ulli"
-                ambientMusicUrl="https://stream.zeno.fm/f3wvbbqmdg8uv"
+                ambientMusicUrl="https://ice3.somafm.com/spacestation-128-mp3"
               />
             </div>
           </motion.div>
