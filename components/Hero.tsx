@@ -16,12 +16,12 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
 
   return (
     <>
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex flex-col lg:flex-row gap-8 sm:gap-10 lg:gap-16 items-center">
+      <div className="w-full max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-center lg:items-center">
           {/* Left Side - Text Content */}
-          <div className="flex-1 space-y-6 sm:space-y-8 text-center lg:text-left">
-            <div className="space-y-4 sm:space-y-6">
-              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1]">
+          <div className="flex-1 space-y-8">
+            <div className="space-y-6">
+              <div className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1]">
                 <BlurText
                   text="Ты не слушаешь переговоры."
                   delay={50}
@@ -43,21 +43,21 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
-                className="text-base sm:text-lg lg:text-xl text-muted/90 leading-relaxed max-w-2xl mx-auto lg:mx-0"
+                className="text-lg lg:text-xl text-muted/90 leading-relaxed"
               >
                 Медитация на частоте десяти тысяч метров. Голоса пилотов и диспетчеров в реальном времени — спокойно и глубоко.
               </motion.p>
             </div>
 
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 items-stretch sm:items-center justify-center lg:justify-start">
+            <div className="flex flex-wrap gap-4 items-center">
               <motion.button
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 1.3, ease: "easeOut" }}
                 onClick={onOpenContextModal}
-                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
+                className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-8 py-4 text-lg font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
               >
-                <Info className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:scale-110" strokeWidth={1.5} />
+                <Info className="h-5 w-5 transition-transform group-hover:scale-110" strokeWidth={1.5} />
                 О проекте
               </motion.button>
 
@@ -66,9 +66,9 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 1.4, ease: "easeOut" }}
                 onClick={onOpenRadioModal}
-                className="group inline-flex items-center justify-center gap-2 rounded-xl border border-border/40 bg-card/50 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-foreground/80 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card/80"
+                className="group inline-flex items-center gap-2 rounded-xl border border-border/40 bg-card/50 px-8 py-4 text-lg font-semibold text-foreground/80 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card/80"
               >
-                <Radio className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:scale-110" strokeWidth={1.5} />
+                <Radio className="h-5 w-5 transition-transform group-hover:scale-110" strokeWidth={1.5} />
                 Радиолюбителям
               </motion.button>
             </div>
@@ -79,7 +79,7 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-            className="w-full sm:max-w-md lg:w-auto lg:flex-shrink-0"
+            className="w-full lg:w-auto lg:flex-shrink-0"
           >
             <div className="w-full lg:w-96">
               <StreamCard

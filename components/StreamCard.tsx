@@ -297,7 +297,7 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
               animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
               exit={{ opacity: 0, height: 0, marginBottom: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="text-center text-xs leading-relaxed text-muted/70 overflow-hidden"
+              className="text-center text-sm leading-relaxed text-muted/70 overflow-hidden"
             >
               Ты на частоте неба. Не подкаст. Не запись.<br />
               Живой эфир между землёй и облаками.
@@ -414,7 +414,7 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
 
         {/* Inactive state message */}
         {!isPlaying && !isLoading && (
-          <div className="text-center text-xs text-muted/60 leading-relaxed pt-2">
+          <div className="text-center text-sm text-muted/60 leading-relaxed pt-2">
             Они говорят. Ты можешь слышать.
           </div>
         )}

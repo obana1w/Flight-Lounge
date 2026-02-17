@@ -22,11 +22,12 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
     <header className="sticky top-0 z-50 h-16 border-b border-border/20 bg-background/30 backdrop-blur-xl">
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6">
         {/* Logo */}
-        <motion.div
+        <motion.a
+          href="/"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="flex items-center"
+          className="flex items-center cursor-pointer"
         >
           <Image
             src="/fl-logo-v2.png"
@@ -36,7 +37,7 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
             className="object-contain sm:w-[180px] sm:h-[50px]"
             priority
           />
-        </motion.div>
+        </motion.a>
 
         {/* Desktop Navigation */}
         <motion.nav

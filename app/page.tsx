@@ -39,7 +39,7 @@ export default function Home() {
           />
 
           <main className="flex-1">
-            <section className="px-0 py-12 sm:py-16 md:py-20 min-h-[calc(100vh-120px)] sm:min-h-[calc(100vh-140px)] md:min-h-[calc(100vh-160px)] flex items-center">
+            <section className="px-6 py-20 min-h-[calc(100vh-160px)] flex items-center">
               <Hero
                 streamCardRef={streamCardRef}
                 onOpenContextModal={() => setIsContextModalOpen(true)}
