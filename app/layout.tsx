@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "FLY LOUNGE — На частоте неба",
-  description: "Премиум минималистичный интерфейс для прослушивания переговоров диспетчеров и пилотов в реальном времени. Москва, Санкт-Петербург, Новосибирск.",
+  description: "Медитация на частоте десяти тысяч метров. Голоса пилотов и диспетчеров в реальном времени — спокойно и глубоко.",
 };
 
 export default function RootLayout({
