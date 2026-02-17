@@ -133,7 +133,7 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
               href="https://dalink.to/flylounge"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all"
+              className="group inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-br from-primary to-secondary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-md transition-all"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

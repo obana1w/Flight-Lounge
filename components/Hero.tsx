@@ -49,15 +49,15 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
               </motion.p>
             </div>
 
-            <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex gap-2 sm:gap-3 lg:gap-4 items-center">
               <motion.button
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 1.3, ease: "easeOut" }}
                 onClick={onOpenContextModal}
-                className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-8 py-4 text-lg font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
+                className="group inline-flex items-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-secondary px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 lg:py-4 text-sm sm:text-base lg:text-lg font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
               >
-                <Info className="h-5 w-5 transition-transform group-hover:scale-110" strokeWidth={1.5} />
+                <Info className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:scale-110" strokeWidth={1.5} />
                 О проекте
               </motion.button>
 
@@ -66,9 +66,9 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 1.4, ease: "easeOut" }}
                 onClick={onOpenRadioModal}
-                className="group inline-flex items-center gap-2 rounded-xl border border-border/40 bg-card/50 px-8 py-4 text-lg font-semibold text-foreground/80 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card/80"
+                className="group inline-flex items-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl border border-border/40 bg-card/50 px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 lg:py-4 text-sm sm:text-base lg:text-lg font-semibold text-foreground/80 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card/80"
               >
-                <Radio className="h-5 w-5 transition-transform group-hover:scale-110" strokeWidth={1.5} />
+                <Radio className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:scale-110" strokeWidth={1.5} />
                 Радиолюбителям
               </motion.button>
             </div>

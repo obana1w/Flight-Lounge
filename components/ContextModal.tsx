@@ -156,7 +156,7 @@ export function ContextModal({ isOpen, onClose, onStartListening }: ContextModal
                   >
                     <button
                       onClick={onStartListening}
-                      className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
+                      className="group inline-flex w-full sm:w-auto items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-secondary px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 lg:py-4 text-sm sm:text-base lg:text-lg font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
                     >
                       Слушать небо
                       <motion.svg
