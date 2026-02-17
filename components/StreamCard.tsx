@@ -116,10 +116,30 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
     };
   }, [isPlaying, ambientMusicUrl]);
 
-  // Listener tracking - send heartbeat and fetch count
+  // Fetch listener count on mount and periodically (even when not playing)
+  useEffect(() => {
+    // Initial count fetch
+    fetch('/api/listeners')
+      .then(res => res.json())
+      .then(data => setLiveListeners(data.listeners))
+      .catch(err => console.error('Failed to fetch listener count:', err));
+
+    // Update listener count every 15 seconds
+    const countInterval = setInterval(() => {
+      fetch('/api/listeners')
+        .then(res => res.json())
+        .then(data => setLiveListeners(data.listeners))
+        .catch(err => console.error('Failed to fetch listener count:', err));
+    }, 15000);
+
+    return () => {
+      clearInterval(countInterval);
+    };
+  }, []);
+
+  // Listener tracking - send heartbeat when playing
   useEffect(() => {
     let heartbeatInterval: NodeJS.Timeout;
-    let countInterval: NodeJS.Timeout;
 
     if (isPlaying) {
       // Send initial heartbeat
@@ -137,20 +157,6 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
           body: JSON.stringify({ sessionId })
         }).catch(err => console.error('Failed to send heartbeat:', err));
       }, 20000);
-
-      // Update listener count every 10 seconds
-      countInterval = setInterval(() => {
-        fetch('/api/listeners')
-          .then(res => res.json())
-          .then(data => setLiveListeners(data.listeners))
-          .catch(err => console.error('Failed to fetch listener count:', err));
-      }, 10000);
-
-      // Initial count fetch
-      fetch('/api/listeners')
-        .then(res => res.json())
-        .then(data => setLiveListeners(data.listeners))
-        .catch(err => console.error('Failed to fetch listener count:', err));
     } else {
       // Remove listener when stopped
       fetch('/api/listeners', {
@@ -162,7 +168,6 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
 
     return () => {
       clearInterval(heartbeatInterval);
-      clearInterval(countInterval);
 
       // Cleanup on unmount
       if (isPlaying) {
