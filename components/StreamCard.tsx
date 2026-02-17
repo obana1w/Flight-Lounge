@@ -259,7 +259,7 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-3xl border bg-card transition-all duration-500 ${
+      className={`group relative overflow-hidden rounded-2xl sm:rounded-3xl border bg-card transition-all duration-500 ${
         isLoading
           ? 'border-primary shadow-2xl shadow-primary/20 animate-pulse'
           : isPlaying
@@ -267,25 +267,25 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
           : 'border-border hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-black/20'
       }`}
     >
-      <div className="relative p-10">
-        <div className="mb-8 flex justify-center">
+      <div className="relative p-6 sm:p-8 lg:p-10">
+        <div className="mb-6 sm:mb-8 flex justify-center">
           <Radio
-            className={`h-12 w-12 text-primary animate-pulse`}
+            className={`h-10 w-10 sm:h-12 sm:w-12 text-primary animate-pulse`}
             style={{ animationDuration: '3s' }}
             strokeWidth={1.5}
           />
         </div>
 
-        <h3 className="mb-3 text-center text-2xl font-bold text-foreground">
+        <h3 className="mb-2 sm:mb-3 text-center text-xl sm:text-2xl font-bold text-foreground">
           {code}
         </h3>
 
-        <p className="mb-2 text-center text-base text-muted">
+        <p className="mb-2 text-center text-sm sm:text-base text-muted">
           {city}
         </p>
 
         {/* Radio Frequency - Always visible */}
-        <div className="mb-4 text-center">
+        <div className="mb-3 sm:mb-4 text-center">
           <span className="font-mono text-xs font-semibold text-primary">118.1 MHz</span>
         </div>
 
@@ -423,11 +423,11 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
         <WeatherWidget show={isPlaying} />
 
         {/* Play/Pause Button - Bottom */}
-        <div className="mt-6 flex justify-center">
+        <div className="mt-4 sm:mt-6 flex justify-center">
           <button
             onClick={isPlaying ? handlePause : handlePlay}
             disabled={isLoading}
-            className={`group inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all ${
+            className={`group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold transition-all ${
               isLoading
                 ? 'cursor-not-allowed opacity-80 bg-primary/50'
                 : 'bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20'

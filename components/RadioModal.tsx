@@ -65,7 +65,7 @@ export function RadioModal({ isOpen, onClose }: RadioModalProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '16px',
+            padding: '12px',
           }}
         >
           {/* Backdrop */}
@@ -97,31 +97,30 @@ export function RadioModal({ isOpen, onClose }: RadioModalProps) {
               style={{
                 position: 'relative',
                 width: '100%',
-                maxHeight: '85vh',
+                maxHeight: '90vh',
                 overflow: 'auto',
               }}
-              className="rounded-3xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-2xl"
+              className="rounded-2xl sm:rounded-3xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-2xl"
             >
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-6 right-6 p-2 rounded-lg text-muted/60 hover:text-foreground hover:bg-background/50 transition-all"
-                style={{ zIndex: 100001 }}
+                className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2 rounded-lg text-muted/60 hover:text-foreground hover:bg-background/50 transition-all z-10"
               >
                 <X className="h-5 w-5" strokeWidth={1.5} />
               </button>
 
               {/* Content */}
-              <div className="p-8 md:p-12">
+              <div className="p-6 sm:p-8 md:p-12">
                 {/* Header */}
-                <div className="mb-8 text-center">
-                  <h2 className="text-sm uppercase tracking-[0.3em] text-muted/60 font-medium">
+                <div className="mb-6 sm:mb-8 text-center">
+                  <h2 className="text-xs sm:text-sm uppercase tracking-[0.3em] text-muted/60 font-medium">
                     Для радиолюбителей
                   </h2>
                 </div>
 
                 {/* Text */}
-                <div className="space-y-8">
+                <div className="space-y-6 sm:space-y-8">
                   {paragraphs.map((text, index) => (
                     <motion.p
                       key={index}
@@ -132,7 +131,7 @@ export function RadioModal({ isOpen, onClose }: RadioModalProps) {
                         delay: 0.1 + index * 0.1,
                         ease: "easeOut"
                       }}
-                      className="text-base md:text-lg leading-relaxed text-foreground/80 text-center whitespace-pre-line"
+                      className="text-sm sm:text-base md:text-lg leading-relaxed text-foreground/80 text-center whitespace-pre-line"
                     >
                       {text}
                     </motion.p>
