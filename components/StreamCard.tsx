@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { Radio, Circle, Volume2, Music } from "lucide-react";
+import { Radio, Circle, Volume2, Music, Play, Pause, Loader2 } from "lucide-react";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { fetchStreamUrl } from "@/lib/streamUtils";
 import { motion, AnimatePresence } from "motion/react";
@@ -421,6 +421,36 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
 
         {/* Weather Widget */}
         <WeatherWidget show={isPlaying} />
+
+        {/* Play/Pause Button - Bottom */}
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={isPlaying ? handlePause : handlePlay}
+            disabled={isLoading}
+            className={`group inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all ${
+              isLoading
+                ? 'cursor-not-allowed opacity-80 bg-primary/50'
+                : 'bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20'
+            }`}
+          >
+            {isLoading ? (
+              <>
+                Подключение...
+                <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2} />
+              </>
+            ) : isPlaying ? (
+              <>
+                Остановить
+                <Pause className="h-4 w-4" strokeWidth={2} />
+              </>
+            ) : (
+              <>
+                Слушать небо
+                <Play className="h-4 w-4 transition-transform group-hover:scale-110" strokeWidth={1.5} />
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Hidden Audio Elements */}

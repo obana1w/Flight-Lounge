@@ -1,45 +1,18 @@
 'use client';
 
-import { Play, Pause, Loader2 } from "lucide-react";
 import { StreamCard, StreamCardRef } from "./StreamCard";
 import BlurText from "./BlurText";
-import { ContextModal } from "./ContextModal";
 import { motion } from "motion/react";
-import { useRef, useState, useEffect } from "react";
+import { RefObject } from "react";
+import { Info, Radio } from "lucide-react";
 
-export function Hero() {
-  const streamCardRef = useRef<StreamCardRef>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+interface HeroProps {
+  streamCardRef: RefObject<StreamCardRef>;
+  onOpenContextModal: () => void;
+  onOpenRadioModal: () => void;
+}
 
-  // Sync loading state with StreamCard
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (streamCardRef.current) {
-        setIsLoading(streamCardRef.current.isLoading);
-        setIsPlaying(streamCardRef.current.isPlaying);
-      }
-    }, 100);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleStartListening = async () => {
-    if (isLoading) return; // Prevent clicks during loading
-
-    if (isPlaying) {
-      streamCardRef.current?.pause();
-      setIsPlaying(false);
-    } else {
-      setIsLoading(true);
-      try {
-        await streamCardRef.current?.play();
-        setIsPlaying(true);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
+export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: HeroProps) {
 
   return (
     <>
@@ -76,45 +49,27 @@ export function Hero() {
               </motion.p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <div className="flex flex-wrap gap-4 items-center">
               <motion.button
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 1.3, ease: "easeOut" }}
-                onClick={handleStartListening}
-                disabled={isLoading}
-                className={`group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-8 py-4 text-lg font-semibold text-primary-foreground shadow-lg transition-all ${
-                  isLoading
-                    ? 'cursor-not-allowed opacity-80'
-                    : 'hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30'
-                }`}
+                onClick={onOpenContextModal}
+                className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-8 py-4 text-lg font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
               >
-                {isLoading ? (
-                  <>
-                    Подключение...
-                    <Loader2 className="h-5 w-5 animate-spin" strokeWidth={2} />
-                  </>
-                ) : isPlaying ? (
-                  <>
-                    Остановить
-                    <Pause className="h-5 w-5" strokeWidth={2} />
-                  </>
-                ) : (
-                  <>
-                    Слушать небо
-                    <Play className="h-5 w-5 transition-transform group-hover:scale-110" strokeWidth={1.5} />
-                  </>
-                )}
+                <Info className="h-5 w-5 transition-transform group-hover:scale-110" strokeWidth={1.5} />
+                О проекте
               </motion.button>
 
               <motion.button
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 1.4, ease: "easeOut" }}
-                onClick={() => setIsModalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl border border-border/40 bg-card/50 px-8 py-4 text-lg font-semibold text-foreground/80 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card/80"
+                onClick={onOpenRadioModal}
+                className="group inline-flex items-center gap-2 rounded-xl border border-border/40 bg-card/50 px-8 py-4 text-lg font-semibold text-foreground/80 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card/80"
               >
-                Зачем это
+                <Radio className="h-5 w-5 transition-transform group-hover:scale-110" strokeWidth={1.5} />
+                Радиолюбителям
               </motion.button>
             </div>
           </div>
@@ -140,13 +95,6 @@ export function Hero() {
           </motion.div>
         </div>
       </div>
-
-      {/* Modal - render outside to ensure proper z-index */}
-      <ContextModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onStartListening={handleStartListening}
-      />
     </>
   );
 }

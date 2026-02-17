@@ -1,10 +1,25 @@
+'use client';
+
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { Footer } from "@/components/Footer";
 import Aurora from "@/components/Aurora";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
+import { ContextModal } from "@/components/ContextModal";
+import { RadioModal } from "@/components/RadioModal";
+import { useState, useRef } from "react";
+import { StreamCardRef } from "@/components/StreamCard";
 
 export default function Home() {
+  const [isContextModalOpen, setIsContextModalOpen] = useState(false);
+  const [isRadioModalOpen, setIsRadioModalOpen] = useState(false);
+  const streamCardRef = useRef<StreamCardRef>(null);
+
+  const handleStartListening = async () => {
+    await streamCardRef.current?.play();
+    setIsContextModalOpen(false);
+  };
+
   return (
     <AudioPlayerProvider>
       <div className="relative min-h-screen bg-background flex flex-col">
@@ -18,16 +33,34 @@ export default function Home() {
 
         {/* Content */}
         <div className="relative z-10 flex flex-col flex-1">
-          <Header />
+          <Header
+            onOpenContextModal={() => setIsContextModalOpen(true)}
+            onOpenRadioModal={() => setIsRadioModalOpen(true)}
+          />
 
           <main className="flex-1">
             <section className="px-6 py-20 min-h-[calc(100vh-160px)] flex items-center">
-              <Hero />
+              <Hero
+                streamCardRef={streamCardRef}
+                onOpenContextModal={() => setIsContextModalOpen(true)}
+                onOpenRadioModal={() => setIsRadioModalOpen(true)}
+              />
             </section>
           </main>
 
           <Footer />
         </div>
+
+        {/* Modals */}
+        <ContextModal
+          isOpen={isContextModalOpen}
+          onClose={() => setIsContextModalOpen(false)}
+          onStartListening={handleStartListening}
+        />
+        <RadioModal
+          isOpen={isRadioModalOpen}
+          onClose={() => setIsRadioModalOpen(false)}
+        />
       </div>
     </AudioPlayerProvider>
   );

@@ -13,7 +13,7 @@ export function Footer() {
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             className="text-sm text-muted/60 text-center"
           >
-            © {new Date().getFullYear()} FLY LOUNGE. Голос неба между рейсами. Всегда на связи.
+            © {new Date().getFullYear()} Fly Lounge - Голос неба между рейсами.
           </motion.p>
         </div>
       </div>
