@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 export function Footer() {
   return (
     <footer className="relative z-10 border-t border-border/20 bg-background/30 backdrop-blur-xl">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 sm:py-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6">
         <div className="flex flex-col items-center gap-3">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
