@@ -44,7 +44,7 @@ export function Header({ onOpenRadioModal }: HeaderProps) {
           className="flex items-center cursor-pointer"
         >
           <Image
-            src="/logo_main.png"
+            src="/logo_new.png"
             alt="FLY LOUNGE"
             width={120}
             height={35}
