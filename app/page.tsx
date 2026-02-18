@@ -3,6 +3,10 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { Footer } from "@/components/Footer";
+import { PhilosophySection } from "@/components/PhilosophySection";
+import { FeaturesSection } from "@/components/FeaturesSection";
+import { WeatherRibbon } from "@/components/WeatherRibbon";
+import { BoardingPassSection } from "@/components/BoardingPassSection";
 import Aurora from "@/components/Aurora";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import { ContextModal } from "@/components/ContextModal";
@@ -64,21 +68,37 @@ export default function Home() {
         {/* Content */}
         <div className="relative z-10 flex flex-col flex-1">
           <Header
-            onOpenContextModal={() => setIsContextModalOpen(true)}
             onOpenRadioModal={() => setIsRadioModalOpen(true)}
           />
 
           <main className="flex-1">
-            <section className="px-4 sm:px-6 pt-6 pb-6 sm:py-12 lg:py-20 lg:min-h-[calc(100vh-160px)] flex items-start lg:items-center">
+            {/* Hero Section */}
+            <section className="pt-6 pb-10 sm:pt-10 sm:pb-12 md:pt-14 md:pb-14 lg:pt-20 lg:pb-14 lg:min-h-[calc(100vh-160px)] flex items-start lg:items-center">
               <Hero
                 streamCardRef={streamCardRef}
                 onOpenContextModal={() => setIsContextModalOpen(true)}
                 onOpenRadioModal={() => setIsRadioModalOpen(true)}
               />
             </section>
+
+            {/* Philosophy Section */}
+            <div id="philosophy">
+              <PhilosophySection />
+            </div>
+
+            {/* Features Section */}
+            <div id="features">
+              <FeaturesSection />
+            </div>
+
+            {/* Weather Ribbon */}
+            <WeatherRibbon />
+
+            {/* Boarding Pass Section */}
+            <BoardingPassSection onStartListening={handleStartListening} />
           </main>
 
-          <Footer />
+          <Footer onOpenRadioModal={() => setIsRadioModalOpen(true)} />
         </div>
 
         {/* Modals */}

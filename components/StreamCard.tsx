@@ -439,7 +439,7 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
           <button
             onClick={isPlaying ? handlePause : handlePlay}
             disabled={isLoading}
-            className={`group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold transition-all ${
+            className={`group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-[10px] px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold transition-all ${
               isLoading
                 ? 'cursor-not-allowed opacity-80 bg-primary/50'
                 : 'bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20'
@@ -458,7 +458,22 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
             ) : (
               <>
                 Слушать небо
-                <Play className="h-4 w-4 transition-transform group-hover:scale-110" strokeWidth={1.5} />
+                <motion.svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={{ x: 0 }}
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <polygon points="6 3 20 12 6 21 6 3" />
+                </motion.svg>
               </>
             )}
           </button>

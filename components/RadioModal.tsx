@@ -100,7 +100,7 @@ export function RadioModal({ isOpen, onClose }: RadioModalProps) {
                 maxHeight: '90vh',
                 overflow: 'auto',
               }}
-              className="rounded-2xl sm:rounded-3xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-2xl"
+              className="rounded-xl sm:rounded-2xl lg:rounded-3xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-2xl"
             >
               {/* Close button */}
               <button
@@ -111,16 +111,16 @@ export function RadioModal({ isOpen, onClose }: RadioModalProps) {
               </button>
 
               {/* Content */}
-              <div className="p-6 sm:p-8 md:p-12">
+              <div className="p-5 sm:p-6 md:p-8 lg:p-12">
                 {/* Header */}
-                <div className="mb-6 sm:mb-8 text-center">
-                  <h2 className="text-xs sm:text-sm uppercase tracking-[0.3em] text-muted/60 font-medium">
+                <div className="mb-5 sm:mb-6 lg:mb-8 text-center">
+                  <h2 className="text-[11px] sm:text-xs lg:text-sm uppercase tracking-[0.25em] sm:tracking-[0.3em] text-muted/60 font-medium font-mono">
                     Для радиолюбителей
                   </h2>
                 </div>
 
                 {/* Text */}
-                <div className="space-y-6 sm:space-y-8">
+                <div className="space-y-5 sm:space-y-6 lg:space-y-8">
                   {paragraphs.map((text, index) => (
                     <motion.p
                       key={index}
@@ -131,7 +131,7 @@ export function RadioModal({ isOpen, onClose }: RadioModalProps) {
                         delay: 0.1 + index * 0.1,
                         ease: "easeOut"
                       }}
-                      className="text-sm sm:text-base md:text-lg leading-relaxed text-foreground/80 text-center whitespace-pre-line"
+                      className="text-[14px] sm:text-[15px] lg:text-base leading-[1.9] text-muted-foreground font-light text-center whitespace-pre-line px-2 sm:px-0"
                     >
                       {text.includes('cloud@flylounge.ru') ? (
                         <>
@@ -159,16 +159,25 @@ export function RadioModal({ isOpen, onClose }: RadioModalProps) {
                     delay: 0.1 + paragraphs.length * 0.1,
                     ease: "easeOut"
                   }}
-                  className="mt-8 sm:mt-12 flex justify-center"
+                  className="mt-6 sm:mt-8 lg:mt-12 flex justify-center"
                 >
                   <a
                     href="mailto:cloud@flylounge.ru"
-                    className="group inline-flex w-full sm:w-auto items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-secondary px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 lg:py-4 text-sm sm:text-base lg:text-lg font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
+                    className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 rounded-[10px] bg-gradient-to-br from-primary to-secondary px-6 sm:px-7 py-3 sm:py-[14px] text-[14px] sm:text-[15px] font-semibold text-white transition-all hover:-translate-y-0.5"
+                    style={{
+                      boxShadow: '0 4px 20px rgba(59, 130, 246, 0.25)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = '0 8px 32px rgba(59, 130, 246, 0.35)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = '0 4px 20px rgba(59, 130, 246, 0.25)';
+                    }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
+                      width="16"
+                      height="16"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"

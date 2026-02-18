@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLY LOUNGE — Prototype A: Sky Terminal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  /* FlyLounge original palette */
+  --bg: #0B1120;
+  --card: #141B2D;
+  --card-hover: #1A2338;
+  --primary: #3B82F6;
+  --secondary: #6366F1;
+  --foreground: #F8FAFC;
+  --muted: #64748B;
+  --muted-fg: #94A3B8;
+  --border: #1E293B;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+
+  /* Extended sky palette */
+  --sky-50: #EFF6FF;
+  --sky-100: #DBEAFE;
+  --sky-200: #BFDBFE;
+  --sky-400: #60A5FA;
+  --sky-900: #0C1D3A;
+  --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--foreground);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(11, 17, 32, 0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(30, 41, 59, 0.2);
+  transition: background 0.4s;
+}
+
+.nav.scrolled {
+  background: rgba(11, 17, 32, 0.85);
+  border-bottom-color: rgba(30, 41, 59, 0.5);
+}
+
+.nav__logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: var(--foreground);
+}
+
+.nav__center {
+  display: flex;
+  gap: 32px;
+}
+
+.nav__link {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav__link:hover { color: var(--foreground); }
+
+.nav__right { display: flex; gap: 12px; align-items: center; }
+
+.btn-sm {
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.3s;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-sm--ghost {
+  background: rgba(30, 41, 59, 0.5);
+  color: var(--muted-fg);
+  border: 1px solid var(--border);
+}
+.btn-sm--ghost:hover { color: var(--foreground); border-color: var(--primary); }
+
+.btn-sm--primary {
+  background: var(--gradient-primary);
+  color: #fff;
+}
+.btn-sm--primary:hover { box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3); transform: translateY(-1px); }
+
+
+/* ═══════════════════════════════════════════
+   HERO — Concept 2 departure board approach
+   ═══════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  padding: 100px 24px 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  max-width: 1280px;
+  margin: 0 auto;
+  align-items: center;
+}
+
+/* Animated sky background */
+.hero-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 120% 60% at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 50% at 80% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+    var(--bg);
+}
+
+.hero__text { padding: 20px 0; }
+
+.hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 100px;
+  margin-bottom: 24px;
+}
+
+.hero__badge-dot {
+  width: 7px; height: 7px;
+  background: var(--success);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+}
+
+.hero__badge span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--primary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.hero__title {
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
+.hero__title-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero__desc {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--muted-fg);
+  max-width: 460px;
+  margin-bottom: 32px;
+  font-weight: 300;
+}
+
+.hero__buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.3s;
+  cursor: pointer;
+  border: none;
+}
+
+.btn--gradient {
+  background: var(--gradient-primary);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25);
+}
+.btn--gradient:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(59, 130, 246, 0.35); }
+
+.btn--outline {
+  background: rgba(20, 27, 45, 0.5);
+  color: var(--foreground);
+  border: 1px solid rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(4px);
+}
+.btn--outline:hover { border-color: rgba(59, 130, 246, 0.5); background: rgba(20, 27, 45, 0.8); }
+
+
+/* ═══════════════════════════════════════════
+   DEPARTURE BOARD — inspired by Concept 2
+   ═══════════════════════════════════════════ */
+.board {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.board__header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: rgba(30, 41, 59, 0.15);
+}
+
+.board__title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.board__live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--success);
+  letter-spacing: 1px;
+}
+
+.board__live::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--success);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.board__rows { padding: 8px; }
+
+.board__row {
+  display: grid;
+  grid-template-columns: 72px 1fr 80px;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.board__row:hover { background: var(--card-hover); }
+
+.board__row--active {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.board__code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.board__city {
+  font-size: 13px;
+  color: var(--muted-fg);
+}
+
+.board__status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-align: right;
+  letter-spacing: 1px;
+}
+
+.board__status--on { color: var(--success); }
+.board__status--off { color: var(--muted); }
+
+/* Inline player */
+.board__player {
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(30, 41, 59, 0.1);
+}
+
+.board__play {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: var(--gradient-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+.board__play:hover { transform: scale(1.05); box-shadow: 0 6px 24px rgba(59, 130, 246, 0.4); }
+
+.board__play svg { width: 18px; height: 18px; fill: #fff; margin-left: 2px; }
+
+.board__np { flex: 1; }
+
+.board__np-label {
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 2px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.board__np-name { font-size: 14px; font-weight: 500; }
+
+.board__volume {
+  display: flex;
+  gap: 16px;
+}
+
+.vol-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.vol-group label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.vol-slider {
+  -webkit-appearance: none;
+  width: 72px; height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+}
+
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.vol-slider.atc::-webkit-slider-thumb { background: var(--primary); box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
+.vol-slider.amb::-webkit-slider-thumb { background: var(--secondary); box-shadow: 0 0 8px rgba(99, 102, 241, 0.4); }
+
+
+/* ═══════════════════════════════════════════
+   FEATURES — Three cards
+   ═══════════════════════════════════════════ */
+.features {
+  padding: 100px 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.section-title {
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.section-subtitle {
+  font-size: 15px;
+  color: var(--muted-fg);
+  max-width: 360px;
+  line-height: 1.6;
+  text-align: right;
+  font-weight: 300;
+}
+
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.fcard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 24px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.fcard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0; right: 0;
+  height: 2px;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.fcard:hover { transform: translateY(-4px); border-color: rgba(59, 130, 246, 0.2); }
+.fcard:hover::before { opacity: 1; }
+
+.fcard__icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: rgba(59, 130, 246, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.fcard__icon svg { width: 20px; height: 20px; stroke: var(--primary); fill: none; stroke-width: 2; }
+
+.fcard__icon--secondary { background: rgba(99, 102, 241, 0.1); }
+.fcard__icon--secondary svg { stroke: var(--secondary); }
+
+.fcard__icon--success { background: rgba(16, 185, 129, 0.1); }
+.fcard__icon--success svg { stroke: var(--success); }
+
+.fcard__title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.fcard__desc {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted-fg);
+}
+
+
+/* ═══════════════════════════════════════════
+   WEATHER RIBBON
+   ═══════════════════════════════════════════ */
+.weather-ribbon {
+  padding: 40px 24px;
+  background: rgba(20, 27, 45, 0.6);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.weather-ribbon__inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.wr__left { display: flex; align-items: center; gap: 24px; }
+
+.wr__station {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 4px;
+}
+
+.wr__metar {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+.wr__data { display: flex; gap: 40px; }
+
+.wr__item { text-align: center; }
+
+.wr__item-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--sky-400);
+}
+
+.wr__item-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+
+/* ═══════════════════════════════════════════
+   ABOUT — Magazine split from Concept 2
+   ═══════════════════════════════════════════ */
+.about {
+  padding: 100px 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.about__sticky {
+  position: sticky;
+  top: 96px;
+}
+
+.about__label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.about__heading {
+  font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 20px;
+}
+
+.about__heading .gradient { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.about__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: none;
+  transition: gap 0.2s;
+}
+
+.about__link:hover { gap: 10px; }
+
+.about__content {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.about__p {
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--muted-fg);
+  font-weight: 300;
+}
+
+.about__p:first-child::first-letter {
+  font-size: 48px;
+  float: left;
+  line-height: 1;
+  margin-right: 10px;
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.about__quote {
+  padding: 28px;
+  background: rgba(59, 130, 246, 0.06);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 12px 12px 0;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--foreground);
+}
+
+
+/* ═══════════════════════════════════════════
+   BOARDING PASS CTA — from Concept 2
+   ═══════════════════════════════════════════ */
+.cta-section {
+  padding: 60px 24px 100px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.boarding-pass {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+}
+
+.bp__main {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 36px;
+}
+
+.bp__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bp__airline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.bp__class {
+  padding: 4px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--primary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.bp__route {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.bp__point {}
+
+.bp__point-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 4px;
+}
+
+.bp__point-name {
+  font-size: 13px;
+  color: var(--muted-fg);
+  margin-top: 4px;
+}
+
+.bp__line {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bp__line-dash {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 6px, transparent 6px, transparent 12px);
+}
+
+.bp__line svg {
+  width: 20px; height: 20px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.bp__footer {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.bp__info { display: flex; flex-direction: column; gap: 4px; }
+
+.bp__info-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.bp__info-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bp__info-value--green { color: var(--success); }
+
+.bp__stub {
+  background: rgba(30, 41, 59, 0.3);
+  padding: 40px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  border-left: 2px dashed var(--border);
+  text-align: center;
+}
+
+.bp__stub-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+
+/* ═══════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════ */
+.footer {
+  padding: 32px 24px;
+  border-top: 1px solid rgba(30, 41, 59, 0.3);
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer__brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer__logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.footer__copy { font-size: 13px; color: var(--muted); }
+
+.footer__links { display: flex; gap: 20px; }
+
+.footer__links a {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer__links a:hover { color: var(--foreground); }
+
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .hero { grid-template-columns: 1fr; padding-top: 96px; min-height: auto; }
+  .board { max-width: 560px; }
+  .features__grid { grid-template-columns: 1fr 1fr; }
+  .about { grid-template-columns: 1fr; gap: 32px; }
+  .about__sticky { position: static; }
+  .boarding-pass { grid-template-columns: 1fr; }
+  .bp__stub { border-left: none; border-top: 2px dashed var(--border); }
+}
+
+@media (max-width: 768px) {
+  .nav__center { display: none; }
+  .hero { padding: 88px 16px 48px; gap: 32px; }
+  .hero__buttons { flex-direction: column; }
+  .btn { width: 100%; justify-content: center; }
+  .features { padding: 64px 16px; }
+  .features__grid { grid-template-columns: 1fr; }
+  .section-header { flex-direction: column; align-items: flex-start; }
+  .section-subtitle { text-align: left; }
+  .weather-ribbon { padding: 28px 16px; }
+  .weather-ribbon__inner { flex-direction: column; align-items: flex-start; }
+  .about { padding: 64px 16px; }
+  .cta-section { padding: 40px 16px 64px; }
+  .bp__route { flex-direction: column; text-align: center; }
+  .bp__line { display: none; }
+  .bp__footer { gap: 20px; }
+  .footer { padding: 24px 16px; flex-direction: column; gap: 16px; }
+  .board__volume { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero-bg"></div>
+
+<!-- Navigation -->
+<nav class="nav" id="nav">
+  <div class="nav__logo">FLY LOUNGE</div>
+  <div class="nav__center">
+    <a href="#features" class="nav__link">Возможности</a>
+    <a href="#about" class="nav__link">О проекте</a>
+    <a href="#" class="nav__link">Радиолюбителям</a>
+  </div>
+  <div class="nav__right">
+    <a href="#" class="btn-sm btn-sm--ghost">Поддержать</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero__text">
+    <div class="hero__badge">
+      <div class="hero__badge-dot"></div>
+      <span>В эфире прямо сейчас</span>
+    </div>
+    <h1 class="hero__title">
+      Ты не слушаешь переговоры.<br>
+      <span class="hero__title-gradient">Ты подслушиваешь небо.</span>
+    </h1>
+    <p class="hero__desc">
+      Живые голоса пилотов и диспетчеров, мягкий эмбиент и метеоданные —
+      медитация на частоте десяти тысяч метров.
+    </p>
+    <div class="hero__buttons">
+      <a href="#" class="btn btn--gradient">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="6,3 20,12 6,21"/></svg>
+        Слушать небо
+      </a>
+      <a href="#about" class="btn btn--outline">О проекте</a>
+    </div>
+  </div>
+
+  <!-- Departure Board -->
+  <div class="board">
+    <div class="board__header">
+      <div class="board__title">На частоте</div>
+      <div class="board__live">В эфире</div>
+    </div>
+    <div class="board__rows">
+      <div class="board__row board__row--active">
+        <div class="board__code">ULLI</div>
+        <div class="board__city">Санкт-Петербург · Пулково</div>
+        <div class="board__status board__status--on">● LIVE</div>
+      </div>
+      <div class="board__row">
+        <div class="board__code">UWKD</div>
+        <div class="board__city">Казань</div>
+        <div class="board__status board__status--on">● LIVE</div>
+      </div>
+      <div class="board__row">
+        <div class="board__code">UAAA</div>
+        <div class="board__city">Алматы</div>
+        <div class="board__status board__status--on">● LIVE</div>
+      </div>
+      <div class="board__row">
+        <div class="board__code">UNEE</div>
+        <div class="board__city">Кемерово</div>
+        <div class="board__status board__status--off">OFFLINE</div>
+      </div>
+      <div class="board__row">
+        <div class="board__code">USDD</div>
+        <div class="board__city">Салехард</div>
+        <div class="board__status board__status--on">● LIVE</div>
+      </div>
+    </div>
+    <div class="board__player">
+      <button class="board__play">
+        <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+      </button>
+      <div class="board__np">
+        <div class="board__np-label">Сейчас</div>
+        <div class="board__np-name">ULLI · Пулково Approach</div>
+      </div>
+      <div class="board__volume">
+        <div class="vol-group">
+          <label>ATC</label>
+          <input type="range" class="vol-slider atc" min="0" max="100" value="80">
+        </div>
+        <div class="vol-group">
+          <label>AMB</label>
+          <input type="range" class="vol-slider amb" min="0" max="100" value="35">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="section-header">
+    <h2 class="section-title">Почему FLY LOUNGE</h2>
+    <p class="section-subtitle">Не радио, не подкаст — живое окно в мир авиации для работы, медитации и удовольствия.</p>
+  </div>
+  <div class="features__grid">
+    <div class="fcard">
+      <div class="fcard__icon">
+        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+      </div>
+      <div class="fcard__title">Живой эфир ATC</div>
+      <div class="fcard__desc">Настоящие переговоры пилотов и диспетчеров из пяти аэропортов — в реальном времени, 24/7.</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard__icon fcard__icon--secondary">
+        <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </div>
+      <div class="fcard__title">Эмбиент-микс</div>
+      <div class="fcard__desc">Голоса неба наложены на деликатный эмбиент. Два независимых регулятора для идеального баланса.</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard__icon fcard__icon--success">
+        <svg viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+      </div>
+      <div class="fcard__title">Погода аэропорта</div>
+      <div class="fcard__desc">METAR-данные в реальном времени: ветер, температура, видимость, восход и закат.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Weather Ribbon -->
+<div class="weather-ribbon">
+  <div class="weather-ribbon__inner">
+    <div class="wr__left">
+      <div class="wr__station">ULLI</div>
+      <div class="wr__metar">METAR ULLI 171830Z 24008KT 9999 SCT040 M04/M10 Q1024 NOSIG</div>
+    </div>
+    <div class="wr__data">
+      <div class="wr__item">
+        <div class="wr__item-value">240°/8kt</div>
+        <div class="wr__item-label">Ветер</div>
+      </div>
+      <div class="wr__item">
+        <div class="wr__item-value">−4°C</div>
+        <div class="wr__item-label">Темп.</div>
+      </div>
+      <div class="wr__item">
+        <div class="wr__item-value">&gt;10km</div>
+        <div class="wr__item-label">Видимость</div>
+      </div>
+      <div class="wr__item">
+        <div class="wr__item-value">1024</div>
+        <div class="wr__item-label">QNH hPa</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- About -->
+<section class="about" id="about">
+  <div class="about__sticky">
+    <div class="about__label">О проекте</div>
+    <h2 class="about__heading">
+      Медитация на частоте<br>
+      <span class="gradient">десяти тысяч метров</span>
+    </h2>
+    <a href="#" class="about__link">Стать частью проекта →</a>
+  </div>
+  <div class="about__content">
+    <p class="about__p">
+      FLY LOUNGE — это не сервис прослушивания радио. Это пространство, где
+      технология и эстетика встречаются на высоте. Мы берём живые переговоры
+      аэропортов и превращаем их в опыт, достойный лаунжа первого класса.
+    </p>
+    <div class="about__quote">
+      «Каждое слово в эфире — результат тысяч часов подготовки. Этот поток
+      не хаотичен — он точен, как часовой механизм.»
+    </div>
+    <p class="about__p">
+      Мы добавляем к переговорам эмбиент и метеоданные, чтобы вы могли
+      погрузиться в атмосферу неба, не покидая своего кресла. Тишина между
+      рейсами — это и есть музыка на высоте.
+    </p>
+  </div>
+</section>
+
+<!-- Boarding Pass CTA -->
+<section class="cta-section">
+  <div class="boarding-pass">
+    <div class="bp__main">
+      <div class="bp__header">
+        <div class="bp__airline">FLY LOUNGE</div>
+        <div class="bp__class">Sky Class</div>
+      </div>
+      <div class="bp__route">
+        <div class="bp__point">
+          <div class="bp__point-code">ВАШ</div>
+          <div class="bp__point-name">Ваше кресло</div>
+        </div>
+        <div class="bp__line">
+          <div class="bp__line-dash"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.4-.1.9.3 1.1L11 12l-2 3H6l-1 1 3 2 2 3 1-1v-3l3-2 3.7 7.3c.2.4.7.5 1.1.3l.5-.3c.4-.2.5-.7.4-1.1Z"/></svg>
+          <div class="bp__line-dash"></div>
+        </div>
+        <div class="bp__point">
+          <div class="bp__point-code">НЕБО</div>
+          <div class="bp__point-name">Эфир в реальном времени</div>
+        </div>
+      </div>
+      <div class="bp__footer">
+        <div class="bp__info">
+          <div class="bp__info-label">Рейс</div>
+          <div class="bp__info-value">FL 001</div>
+        </div>
+        <div class="bp__info">
+          <div class="bp__info-label">Частота</div>
+          <div class="bp__info-value">118.1 MHz</div>
+        </div>
+        <div class="bp__info">
+          <div class="bp__info-label">Статус</div>
+          <div class="bp__info-value bp__info-value--green">Boarding</div>
+        </div>
+        <div class="bp__info">
+          <div class="bp__info-label">Формат</div>
+          <div class="bp__info-value">24/7 Live</div>
+        </div>
+      </div>
+    </div>
+    <div class="bp__stub">
+      <div class="bp__stub-label">Ваш посадочный</div>
+      <a href="#" class="btn btn--gradient" style="width: auto;">Начать слушать</a>
+      <div class="bp__stub-label" style="font-size: 9px; opacity: 0.6;">Бесплатно · Без регистрации</div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer__brand">
+    <div class="footer__logo">FLY LOUNGE</div>
+    <div class="footer__copy">Голос неба между рейсами · 2026</div>
+  </div>
+  <div class="footer__links">
+    <a href="mailto:cloud@flylounge.ru">cloud@flylounge.ru</a>
+    <a href="#">Радиолюбителям</a>
+    <a href="#">Поддержать</a>
+  </div>
+</footer>
+
+<script>
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+});
+</script>
+
+</body>
+</html>

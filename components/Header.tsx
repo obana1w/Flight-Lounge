@@ -6,11 +6,10 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
 interface HeaderProps {
-  onOpenContextModal: () => void;
   onOpenRadioModal: () => void;
 }
 
-export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
+export function Header({ onOpenRadioModal }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleModalOpen = (callback: () => void) => {
@@ -18,9 +17,24 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
     setMobileMenuOpen(false);
   };
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const headerOffset = window.innerWidth >= 640 ? 64 : 56; // h-16 on desktop, h-14 on mobile
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <header className="sticky top-0 z-50 h-16 border-b border-border/20 bg-background/30 backdrop-blur-xl">
-      <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6">
+    <header className="sticky top-0 z-50 h-14 sm:h-16 border-b border-border/20 bg-background/30 backdrop-blur-xl">
+      <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <motion.a
           href="/"
@@ -30,11 +44,11 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
           className="flex items-center cursor-pointer"
         >
           <Image
-            src="/fl-logo-v2.png"
+            src="/logo_main.png"
             alt="FLY LOUNGE"
-            width={140}
-            height={40}
-            className="object-contain sm:w-[180px] sm:h-[50px]"
+            width={120}
+            height={35}
+            className="object-contain w-[120px] h-[35px] sm:w-[150px] sm:h-[42px] lg:w-[180px] lg:h-[50px]"
             priority
           />
         </motion.a>
@@ -47,10 +61,16 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
           className="hidden md:flex items-center gap-6 lg:gap-8"
         >
           <button
-            onClick={onOpenContextModal}
+            onClick={() => scrollToSection('philosophy')}
             className="text-sm font-medium text-foreground/70 transition-colors hover:text-primary whitespace-nowrap"
           >
-            О проекте
+            Философия
+          </button>
+          <button
+            onClick={() => scrollToSection('features')}
+            className="text-sm font-medium text-foreground/70 transition-colors hover:text-primary whitespace-nowrap"
+          >
+            Возможности
           </button>
           <button
             onClick={onOpenRadioModal}
@@ -71,12 +91,21 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
             href="https://dalink.to/flylounge"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-secondary px-4 lg:px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 whitespace-nowrap"
+            className="group inline-flex items-center gap-2 rounded-[10px] bg-gradient-to-br from-primary to-secondary px-5 py-2 text-[13px] font-semibold text-white transition-all hover:-translate-y-0.5 whitespace-nowrap"
+            style={{
+              boxShadow: '0 4px 20px rgba(59, 130, 246, 0.25)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 8px 32px rgba(59, 130, 246, 0.35)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 4px 20px rgba(59, 130, 246, 0.25)';
+            }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
+              width="14"
+              height="14"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -118,10 +147,16 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
         >
           <nav className="flex flex-col px-4 py-4 space-y-3">
             <button
-              onClick={() => handleModalOpen(onOpenContextModal)}
+              onClick={() => scrollToSection('philosophy')}
               className="text-left px-4 py-3 text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
             >
               О проекте
+            </button>
+            <button
+              onClick={() => scrollToSection('features')}
+              className="text-left px-4 py-3 text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+            >
+              Возможности
             </button>
             <button
               onClick={() => handleModalOpen(onOpenRadioModal)}
@@ -133,12 +168,15 @@ export function Header({ onOpenContextModal, onOpenRadioModal }: HeaderProps) {
               href="https://dalink.to/flylounge"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-br from-primary to-secondary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-md transition-all"
+              className="group inline-flex items-center justify-center gap-2 rounded-[10px] bg-gradient-to-br from-primary to-secondary px-5 py-2 text-[13px] font-semibold text-white transition-all"
+              style={{
+                boxShadow: '0 4px 20px rgba(59, 130, 246, 0.25)'
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
+                width="14"
+                height="14"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"

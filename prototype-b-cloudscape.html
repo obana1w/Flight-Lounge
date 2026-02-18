@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLY LOUNGE — Prototype B: Cloudscape</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0B1120;
+  --card: #141B2D;
+  --card-hover: #1A2338;
+  --primary: #3B82F6;
+  --secondary: #6366F1;
+  --foreground: #F8FAFC;
+  --muted: #64748B;
+  --muted-fg: #94A3B8;
+  --border: #1E293B;
+  --success: #10B981;
+  --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--foreground);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════
+   НАВИГАЦИЯ — тонкий glassmorphism бар
+   ═══════════════════════════════════════════ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: 60px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  background: rgba(11, 17, 32, 0.4);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(30, 41, 59, 0.3);
+}
+
+.nav__logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  margin-right: auto;
+}
+
+.nav__links { display: flex; gap: 28px; align-items: center; }
+
+.nav__links a {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted-fg);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav__links a:hover { color: var(--foreground); }
+
+.nav__cta {
+  margin-left: 20px;
+  padding: 7px 18px;
+  background: var(--gradient);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.nav__cta:hover { box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
+
+
+/* ═══════════════════════════════════════════
+   HERO — Центрированный с полноширинной
+   визуализацией Aurora и большой типографикой
+   ═══════════════════════════════════════════ */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  overflow: hidden;
+}
+
+/* Sky gradient layers */
+.hero__sky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 100% 50% at 50% 0%, rgba(59, 130, 246, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 30% 70%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 30% at 70% 90%, rgba(59, 130, 246, 0.06) 0%, transparent 40%),
+    var(--bg);
+}
+
+/* Horizon line */
+.hero__horizon {
+  position: absolute;
+  bottom: 20%;
+  left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.15), transparent);
+}
+
+.hero__content {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+}
+
+.hero__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.hero__meta-dot {
+  width: 8px; height: 8px;
+  background: var(--success);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+}
+
+.hero__meta-sep { color: var(--border); }
+
+.hero__title {
+  font-size: clamp(42px, 6vw, 76px);
+  font-weight: 800;
+  line-height: 1.05;
+  margin-bottom: 24px;
+  letter-spacing: -1px;
+}
+
+.hero__title-line2 {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: block;
+}
+
+.hero__desc {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--muted-fg);
+  font-weight: 300;
+  max-width: 520px;
+  margin: 0 auto 40px;
+}
+
+.hero__buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 14px;
+  text-decoration: none;
+  transition: all 0.3s;
+  cursor: pointer;
+  border: none;
+}
+
+.btn--glow {
+  background: var(--gradient);
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(59,130,246,0.3);
+}
+.btn--glow:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(59,130,246,0.4); }
+
+.btn--glass {
+  background: rgba(20,27,45,0.6);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+.btn--glass:hover { border-color: rgba(59,130,246,0.4); background: rgba(20,27,45,0.9); }
+
+/* Stats bar below hero */
+.hero__stats {
+  position: relative;
+  z-index: 2;
+  margin-top: 80px;
+  display: flex;
+  gap: 48px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat__value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 600;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stat__label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+/* ═══════════════════════════════════════════
+   PLAYER SECTION — Полноширинный интерфейс
+   с выбором станций слева и плеером справа
+   ═══════════════════════════════════════════ */
+.player-section {
+  padding: 80px 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.player-section__label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.player-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* Stations sidebar */
+.stations-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.stations-panel__header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.stn-list { padding: 8px; }
+
+.stn {
+  display: grid;
+  grid-template-columns: 8px 64px 1fr 60px;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.stn:hover { background: var(--card-hover); }
+
+.stn--active {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.stn__dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.stn__dot--on { background: var(--success); }
+.stn__dot--off { background: var(--muted); }
+
+.stn__code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.stn__city {
+  font-size: 13px;
+  color: var(--muted-fg);
+}
+
+.stn__status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-align: right;
+  letter-spacing: 1px;
+}
+.stn__status--on { color: var(--success); }
+.stn__status--off { color: var(--muted); }
+
+/* Main player area */
+.player-main {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle glow */
+.player-main::after {
+  content: '';
+  position: absolute;
+  top: -50%; right: -20%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.player__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.player__station-group {}
+
+.player__icao {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: 6px;
+  margin-bottom: 4px;
+}
+
+.player__city {
+  font-size: 15px;
+  color: var(--muted-fg);
+  font-weight: 300;
+}
+
+.player__live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--success);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.player__live::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--success);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+/* Weather grid inside player */
+.player__weather {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.wx-cell {
+  padding: 14px;
+  background: rgba(30,41,59,0.3);
+  border: 1px solid rgba(30,41,59,0.5);
+  border-radius: 10px;
+}
+
+.wx-cell__label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.wx-cell__value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+/* Controls */
+.player__controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.play-btn {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  border: none;
+  background: var(--gradient);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+}
+
+.play-btn:hover { transform: scale(1.06); box-shadow: 0 8px 28px rgba(59,130,246,0.4); }
+
+.play-btn svg { width: 22px; height: 22px; fill: #fff; margin-left: 2px; }
+
+.sliders-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider-row__label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  width: 56px;
+}
+
+.slider-track {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.slider-fill {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  border-radius: 2px;
+}
+
+.slider-fill--atc { width: 78%; background: var(--primary); }
+.slider-fill--amb { width: 38%; background: var(--secondary); }
+
+.slider-row__pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  width: 32px;
+  text-align: right;
+}
+
+
+/* ═══════════════════════════════════════════
+   PHILOSOPHY — Полноширинный текстовый блок
+   с крупной цитатой
+   ═══════════════════════════════════════════ */
+.philosophy {
+  padding: 100px 32px;
+  position: relative;
+}
+
+.philosophy::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 40% at 50% 50%, rgba(59,130,246,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.philosophy__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.philosophy__label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+
+.philosophy__quote {
+  font-size: clamp(26px, 3.5vw, 40px);
+  font-weight: 300;
+  line-height: 1.4;
+  margin-bottom: 32px;
+}
+
+.philosophy__quote strong {
+  font-weight: 700;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.philosophy__body {
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--muted-fg);
+  font-weight: 300;
+}
+
+.philosophy__divider {
+  width: 48px;
+  height: 2px;
+  background: var(--gradient);
+  margin: 40px auto 0;
+  border-radius: 1px;
+}
+
+
+/* ═══════════════════════════════════════════
+   FEATURES — Три карточки с иконками
+   ═══════════════════════════════════════════ */
+.features {
+  padding: 60px 32px 100px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.fcard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 24px;
+  transition: all 0.4s;
+  position: relative;
+}
+
+.fcard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(59,130,246,0.2);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
+
+.fcard__num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--primary);
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
+.fcard__icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.fcard__icon svg { width: 20px; height: 20px; stroke-width: 2; fill: none; }
+
+.fcard__icon--pri { background: rgba(59,130,246,0.1); }
+.fcard__icon--pri svg { stroke: var(--primary); }
+.fcard__icon--sec { background: rgba(99,102,241,0.1); }
+.fcard__icon--sec svg { stroke: var(--secondary); }
+.fcard__icon--suc { background: rgba(16,185,129,0.1); }
+.fcard__icon--suc svg { stroke: var(--success); }
+
+.fcard__title { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+
+.fcard__desc {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted-fg);
+}
+
+
+/* ═══════════════════════════════════════════
+   CTA — Boarding pass карточка
+   ═══════════════════════════════════════════ */
+.cta-section {
+  padding: 40px 32px 100px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.bp {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+.bp__main {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.bp__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bp__brand {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.bp__badge {
+  padding: 4px 12px;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--primary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.bp__route {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.bp__code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 4px;
+}
+
+.bp__name {
+  font-size: 13px;
+  color: var(--muted-fg);
+  margin-top: 4px;
+}
+
+.bp__connector {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bp__dash {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 6px, transparent 6px, transparent 12px);
+}
+
+.bp__plane-icon {
+  color: var(--primary);
+}
+
+.bp__details {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.bp__detail {}
+
+.bp__detail-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.bp__detail-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bp__detail-value--live { color: var(--success); }
+
+.bp__stub {
+  width: 200px;
+  background: rgba(30,41,59,0.2);
+  border-left: 2px dashed var(--border);
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.bp__stub-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.bp__stub-btn {
+  padding: 12px 24px;
+  background: var(--gradient);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.bp__stub-btn:hover { box-shadow: 0 4px 16px rgba(59,130,246,0.4); }
+
+
+/* ═══════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════ */
+.footer {
+  padding: 28px 32px;
+  border-top: 1px solid rgba(30,41,59,0.3);
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer__logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.footer__tagline { font-size: 13px; color: var(--muted); }
+
+.footer__right { display: flex; gap: 20px; }
+
+.footer__right a {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer__right a:hover { color: var(--foreground); }
+
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .player-grid { grid-template-columns: 1fr; }
+  .stations-panel { order: 2; }
+  .features__grid { grid-template-columns: 1fr 1fr; }
+  .bp { grid-template-columns: 1fr; }
+  .bp__stub { width: 100%; border-left: none; border-top: 2px dashed var(--border); padding: 28px; }
+}
+
+@media (max-width: 768px) {
+  .nav { padding: 0 16px; }
+  .nav__links a:not(:last-child) { display: none; }
+  .hero { padding: 96px 16px 60px; }
+  .hero__stats { gap: 24px; margin-top: 48px; }
+  .player-section { padding: 48px 16px; }
+  .player__weather { grid-template-columns: 1fr 1fr; }
+  .player__controls { flex-direction: column; align-items: stretch; }
+  .play-btn { width: 100%; border-radius: 14px; height: 48px; }
+  .philosophy { padding: 64px 16px; }
+  .features { padding: 40px 16px 64px; }
+  .features__grid { grid-template-columns: 1fr; }
+  .cta-section { padding: 20px 16px 64px; }
+  .bp__route { flex-direction: column; text-align: center; }
+  .bp__connector { display: none; }
+  .bp__details { gap: 20px; }
+  .footer { padding: 24px 16px; flex-direction: column; gap: 12px; }
+  .hero__buttons { flex-direction: column; width: 100%; }
+  .btn { width: 100%; justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav__logo">FLY LOUNGE</div>
+  <div class="nav__links">
+    <a href="#player">Слушать</a>
+    <a href="#philosophy">Философия</a>
+    <a href="#features">Возможности</a>
+    <a href="#" class="nav__cta">Поддержать</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero__sky"></div>
+  <div class="hero__horizon"></div>
+
+  <div class="hero__content">
+    <div class="hero__meta">
+      <div class="hero__meta-dot"></div>
+      <span>5 аэропортов в эфире</span>
+      <span class="hero__meta-sep">·</span>
+      <span>24/7</span>
+    </div>
+
+    <h1 class="hero__title">
+      Подслушивай<br>
+      <span class="hero__title-line2">небо</span>
+    </h1>
+
+    <p class="hero__desc">
+      Живые переговоры пилотов и диспетчеров, смешанные с деликатным эмбиентом.
+      Медитация на частоте десяти тысяч метров.
+    </p>
+
+    <div class="hero__buttons">
+      <a href="#player" class="btn btn--glow">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="6,3 20,12 6,21"/></svg>
+        Слушать небо
+      </a>
+      <a href="#philosophy" class="btn btn--glass">О проекте</a>
+    </div>
+  </div>
+
+  <div class="hero__stats">
+    <div class="stat">
+      <div class="stat__value">5</div>
+      <div class="stat__label">Аэропортов</div>
+    </div>
+    <div class="stat">
+      <div class="stat__value">Live</div>
+      <div class="stat__label">Реальное время</div>
+    </div>
+    <div class="stat">
+      <div class="stat__value">24/7</div>
+      <div class="stat__label">В эфире</div>
+    </div>
+    <div class="stat">
+      <div class="stat__value">0₽</div>
+      <div class="stat__label">Бесплатно</div>
+    </div>
+  </div>
+</section>
+
+<!-- Player -->
+<section class="player-section" id="player">
+  <div class="player-section__label">Сейчас в эфире</div>
+  <div class="player-grid">
+    <!-- Stations -->
+    <div class="stations-panel">
+      <div class="stations-panel__header">Выберите направление</div>
+      <div class="stn-list">
+        <div class="stn stn--active">
+          <div class="stn__dot stn__dot--on"></div>
+          <div class="stn__code">ULLI</div>
+          <div class="stn__city">Санкт-Петербург</div>
+          <div class="stn__status stn__status--on">● LIVE</div>
+        </div>
+        <div class="stn">
+          <div class="stn__dot stn__dot--on"></div>
+          <div class="stn__code">UWKD</div>
+          <div class="stn__city">Казань</div>
+          <div class="stn__status stn__status--on">● LIVE</div>
+        </div>
+        <div class="stn">
+          <div class="stn__dot stn__dot--on"></div>
+          <div class="stn__code">UAAA</div>
+          <div class="stn__city">Алматы</div>
+          <div class="stn__status stn__status--on">● LIVE</div>
+        </div>
+        <div class="stn">
+          <div class="stn__dot stn__dot--off"></div>
+          <div class="stn__code">UNEE</div>
+          <div class="stn__city">Кемерово</div>
+          <div class="stn__status stn__status--off">OFFLINE</div>
+        </div>
+        <div class="stn">
+          <div class="stn__dot stn__dot--on"></div>
+          <div class="stn__code">USDD</div>
+          <div class="stn__city">Салехард</div>
+          <div class="stn__status stn__status--on">● LIVE</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main player -->
+    <div class="player-main">
+      <div class="player__top">
+        <div class="player__station-group">
+          <div class="player__icao">ULLI</div>
+          <div class="player__city">Санкт-Петербург · Пулково Approach</div>
+        </div>
+        <div class="player__live">Live</div>
+      </div>
+
+      <div class="player__weather">
+        <div class="wx-cell">
+          <div class="wx-cell__label">Ветер</div>
+          <div class="wx-cell__value">240°/8kt</div>
+        </div>
+        <div class="wx-cell">
+          <div class="wx-cell__label">Темп.</div>
+          <div class="wx-cell__value">−4°C</div>
+        </div>
+        <div class="wx-cell">
+          <div class="wx-cell__label">Видимость</div>
+          <div class="wx-cell__value">&gt;10 km</div>
+        </div>
+        <div class="wx-cell">
+          <div class="wx-cell__label">QNH</div>
+          <div class="wx-cell__value">1024 hPa</div>
+        </div>
+      </div>
+
+      <div class="player__controls">
+        <button class="play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+        </button>
+        <div class="sliders-area">
+          <div class="slider-row">
+            <div class="slider-row__label">ATC</div>
+            <div class="slider-track"><div class="slider-fill slider-fill--atc"></div></div>
+            <div class="slider-row__pct">78%</div>
+          </div>
+          <div class="slider-row">
+            <div class="slider-row__label">Ambient</div>
+            <div class="slider-track"><div class="slider-fill slider-fill--amb"></div></div>
+            <div class="slider-row__pct">38%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Philosophy -->
+<section class="philosophy" id="philosophy">
+  <div class="philosophy__inner">
+    <div class="philosophy__label">Философия</div>
+    <p class="philosophy__quote">
+      Ты не слушаешь переговоры.<br>
+      <strong>Ты подслушиваешь небо.</strong>
+    </p>
+    <p class="philosophy__body">
+      Каждое слово в эфире — результат тысяч часов подготовки. Этот поток
+      не хаотичен — он точен, как часовой механизм. Мы добавляем к нему
+      эмбиент и метеоданные, чтобы вы могли погрузиться в атмосферу неба,
+      не покидая кресла.
+    </p>
+    <div class="philosophy__divider"></div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="features__grid">
+    <div class="fcard">
+      <div class="fcard__num">01</div>
+      <div class="fcard__icon fcard__icon--pri">
+        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+      </div>
+      <div class="fcard__title">Реальные переговоры</div>
+      <div class="fcard__desc">Не запись, не симуляция. Живые голоса из пяти аэропортов — спокойно, профессионально, завораживающе.</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard__num">02</div>
+      <div class="fcard__icon fcard__icon--sec">
+        <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </div>
+      <div class="fcard__title">Эмбиент-слой</div>
+      <div class="fcard__desc">Музыкальный фон превращает радиочастоту в медитативный опыт. Два независимых регулятора — настройте под себя.</div>
+    </div>
+    <div class="fcard">
+      <div class="fcard__num">03</div>
+      <div class="fcard__icon fcard__icon--suc">
+        <svg viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+      </div>
+      <div class="fcard__title">Данные в реальном времени</div>
+      <div class="fcard__desc">METAR, ветер, температура, восход и закат — всё, чтобы почувствовать себя на эшелоне FL100.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Boarding Pass CTA -->
+<section class="cta-section">
+  <div class="bp">
+    <div class="bp__main">
+      <div class="bp__top">
+        <div class="bp__brand">FLY LOUNGE</div>
+        <div class="bp__badge">Sky Class</div>
+      </div>
+      <div class="bp__route">
+        <div>
+          <div class="bp__code">ВАШ</div>
+          <div class="bp__name">Ваше кресло</div>
+        </div>
+        <div class="bp__connector">
+          <div class="bp__dash"></div>
+          <svg class="bp__plane-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.4-.1.9.3 1.1L11 12l-2 3H6l-1 1 3 2 2 3 1-1v-3l3-2 3.7 7.3c.2.4.7.5 1.1.3l.5-.3c.4-.2.5-.7.4-1.1Z"/></svg>
+          <div class="bp__dash"></div>
+        </div>
+        <div>
+          <div class="bp__code">НЕБО</div>
+          <div class="bp__name">Эфир в реальном времени</div>
+        </div>
+      </div>
+      <div class="bp__details">
+        <div class="bp__detail">
+          <div class="bp__detail-label">Рейс</div>
+          <div class="bp__detail-value">FL 001</div>
+        </div>
+        <div class="bp__detail">
+          <div class="bp__detail-label">Частота</div>
+          <div class="bp__detail-value">118.1 MHz</div>
+        </div>
+        <div class="bp__detail">
+          <div class="bp__detail-label">Статус</div>
+          <div class="bp__detail-value bp__detail-value--live">Boarding</div>
+        </div>
+        <div class="bp__detail">
+          <div class="bp__detail-label">Формат</div>
+          <div class="bp__detail-value">24/7 Live</div>
+        </div>
+      </div>
+    </div>
+    <div class="bp__stub">
+      <div class="bp__stub-text">Ваш посадочный</div>
+      <button class="bp__stub-btn">Слушать небо</button>
+      <div class="bp__stub-text" style="font-size: 9px; opacity: 0.5;">Бесплатно · Без регистрации</div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer__left">
+    <div class="footer__logo">FLY LOUNGE</div>
+    <div class="footer__tagline">Голос неба между рейсами · 2026</div>
+  </div>
+  <div class="footer__right">
+    <a href="mailto:cloud@flylounge.ru">cloud@flylounge.ru</a>
+    <a href="#">Радиолюбителям</a>
+  </div>
+</footer>
+
+</body>
+</html>
