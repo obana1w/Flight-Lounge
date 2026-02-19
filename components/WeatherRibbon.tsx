@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from "motion/react";
+import { useAirport } from "@/contexts/AirportContext";
 
 interface MetarData {
   raw: string;
@@ -14,12 +15,13 @@ interface MetarData {
 }
 
 export function WeatherRibbon() {
+  const { selectedAirport } = useAirport();
   const [metar, setMetar] = useState<MetarData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchMetar = () => {
-      fetch('/api/weather')
+      fetch(`/api/weather?icao=${selectedAirport.code}`)
         .then(res => res.json())
         .then(data => {
           setMetar(data);
@@ -34,13 +36,13 @@ export function WeatherRibbon() {
     // Initial fetch
     fetchMetar();
 
-    // Update every 10 minutes (600000ms)
+    // Update every 5 minutes (300000ms)
     const interval = setInterval(() => {
       fetchMetar();
-    }, 600000);
+    }, 300000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedAirport.code]); // Added selectedAirport.code to dependencies
 
   const formatVisibility = (vis?: number) => {
     if (!vis) return '—';
@@ -74,7 +76,7 @@ export function WeatherRibbon() {
             className="flex flex-col sm:flex-row items-center sm:items-center gap-3 sm:gap-4 lg:gap-6 w-full lg:w-auto"
           >
             <div className="font-mono text-xl sm:text-2xl font-semibold tracking-[0.2em] sm:tracking-[0.25em]">
-              ULLI
+              {selectedAirport.code}
             </div>
             <div className="font-mono text-[10px] sm:text-[11px] text-muted/70 max-w-full sm:max-w-[280px] lg:max-w-[300px] leading-[1.5] break-all sm:break-normal">
               {metar.raw}

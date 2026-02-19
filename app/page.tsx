@@ -9,6 +9,7 @@ import { WeatherRibbon } from "@/components/WeatherRibbon";
 import { BoardingPassSection } from "@/components/BoardingPassSection";
 import Aurora from "@/components/Aurora";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
+import { AirportProvider } from "@/contexts/AirportContext";
 import { ContextModal } from "@/components/ContextModal";
 import { RadioModal } from "@/components/RadioModal";
 import { useState, useRef } from "react";
@@ -51,12 +52,13 @@ export default function Home() {
   };
 
   return (
-    <AudioPlayerProvider>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <div className="relative min-h-screen bg-background flex flex-col">
+    <AirportProvider>
+      <AudioPlayerProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <div className="relative min-h-screen bg-background flex flex-col">
         {/* Aurora Background */}
         <Aurora
           colorStops={["#0B1628", "#1E3A5F", "#3B5998"]}
@@ -111,7 +113,8 @@ export default function Home() {
           isOpen={isRadioModalOpen}
           onClose={() => setIsRadioModalOpen(false)}
         />
-      </div>
-    </AudioPlayerProvider>
+        </div>
+      </AudioPlayerProvider>
+    </AirportProvider>
   );
 }

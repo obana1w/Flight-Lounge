@@ -1,20 +1,16 @@
 'use client';
 
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { Radio, Circle, Volume2, Music, Play, Pause, Loader2 } from "lucide-react";
+import { Radio, Circle, Volume2, Music, Play, Pause, Loader2, ChevronDown } from "lucide-react";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
-import { fetchStreamUrl } from "@/lib/streamUtils";
+import { useAirport } from "@/contexts/AirportContext";
+import { AIRPORTS, AirportConfig } from "@/lib/airportsConfig";
 import { motion, AnimatePresence } from "motion/react";
 import { WeatherWidget } from "./WeatherWidget";
 
 interface StreamCardProps {
-  code: string;
-  city: string;
   listeners: number;
   isLive: boolean;
-  radioScannerCode?: string; // Code for radioscanner.pro (e.g., 'ulli')
-  atcStreamUrl?: string;
-  ambientMusicUrl?: string;
 }
 
 export interface StreamCardRef {
@@ -24,7 +20,8 @@ export interface StreamCardRef {
   isLoading: boolean;
 }
 
-export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, city, listeners, isLive, radioScannerCode, atcStreamUrl, ambientMusicUrl }, ref) => {
+export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listeners, isLive }, ref) => {
+  const { selectedAirport, setSelectedAirport, isLoaded } = useAirport();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [atcVolume, setAtcVolume] = useState(70);
@@ -33,11 +30,30 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
   const [error, setError] = useState<string | null>(null);
   const [liveListeners, setLiveListeners] = useState(0);
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const atcAudioRef = useRef<HTMLAudioElement>(null);
   const musicAudioRef = useRef<HTMLAudioElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { activeStreamId, setActiveStream } = useAudioPlayer();
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   // Handle audio errors
   useEffect(() => {
@@ -61,12 +77,12 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
 
   // Stop playback if another card becomes active
   useEffect(() => {
-    if (activeStreamId !== code && isPlaying) {
+    if (activeStreamId !== selectedAirport.code && isPlaying) {
       atcAudioRef.current?.pause();
       musicAudioRef.current?.pause();
       setIsPlaying(false);
     }
-  }, [activeStreamId, code, isPlaying]);
+  }, [activeStreamId, selectedAirport.code, isPlaying]);
 
   useEffect(() => {
     if (atcAudioRef.current) {
@@ -86,7 +102,7 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
     if (!musicAudio) return;
 
     const handleMusicEnded = () => {
-      if (isPlaying && ambientMusicUrl) {
+      if (isPlaying && selectedAirport.ambientMusicUrl) {
         console.log('Music ended, restarting...');
         musicAudio.currentTime = 0;
         musicAudio.play().catch(err => {
@@ -96,7 +112,7 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
     };
 
     const handleMusicError = () => {
-      if (isPlaying && ambientMusicUrl) {
+      if (isPlaying && selectedAirport.ambientMusicUrl) {
         console.log('Music error, attempting to restart...');
         setTimeout(() => {
           musicAudio.load();
@@ -114,7 +130,7 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
       musicAudio.removeEventListener('ended', handleMusicEnded);
       musicAudio.removeEventListener('error', handleMusicError);
     };
-  }, [isPlaying, ambientMusicUrl]);
+  }, [isPlaying, selectedAirport.ambientMusicUrl]);
 
   // Fetch listener count on mount and periodically (even when not playing)
   useEffect(() => {
@@ -180,77 +196,85 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
     };
   }, [isPlaying, sessionId]);
 
-  const handlePlay = async () => {
-    // If we have a radioScannerCode, use proxy URL
-    if (radioScannerCode && !dynamicStreamUrl) {
-      setIsLoading(true);
-      setError(null);
+  const handlePlay = async (airportOverride?: AirportConfig) => {
+    console.log('[Play] Starting play handler', {
+      isLoaded,
+      selectedAirport,
+      airportOverride
+    });
 
-      try {
-        // Use our proxy endpoint instead of direct URL
-        const proxyUrl = `/api/stream-proxy/${radioScannerCode.toLowerCase()}`;
-        console.log('Using proxy URL:', proxyUrl);
-        setDynamicStreamUrl(proxyUrl);
+    // Wait for context to load
+    if (!isLoaded) {
+      console.warn('[Play] Context not loaded yet, waiting...');
+      setError('Загрузка...');
+      return;
+    }
 
-        // Wait a moment for the audio element to update
-        await new Promise(resolve => setTimeout(resolve, 100));
+    // Use override airport if provided, otherwise use selected airport
+    const airport = airportOverride || selectedAirport;
 
-        // Play ATC stream (critical)
-        if (atcAudioRef.current) {
-          console.log('Setting audio source to proxy:', proxyUrl);
-          atcAudioRef.current.src = proxyUrl;
-          atcAudioRef.current.load(); // Explicitly load the stream
+    // Validate airport config
+    if (!airport || !airport.source || !airport.streamCode) {
+      console.error('[Play] Invalid airport config:', {
+        airport,
+        hasAirport: !!airport,
+        hasSource: !!(airport && airport.source),
+        hasStreamCode: !!(airport && airport.streamCode),
+        selectedAirport,
+        isLoaded
+      });
+      setError('Ошибка конфигурации аэропорта');
+      return;
+    }
 
-          try {
-            await atcAudioRef.current.play();
-            console.log('ATC stream playing successfully');
+    setIsLoading(true);
+    setError(null);
 
-            // Set playing state immediately after ATC starts
-            setIsPlaying(true);
-            setActiveStream(code);
-            setIsLoading(false);
-          } catch (playError) {
-            console.error('Error playing ATC stream:', playError);
-            throw new Error(`Ошибка воспроизведения: ${playError instanceof Error ? playError.message : 'Неизвестная ошибка'}`);
-          }
-        }
+    try {
+      // Build proxy URL using new universal endpoint
+      const proxyUrl = `/api/stream-proxy/${airport.source}/${airport.streamCode}`;
+      console.log(`[${airport.code}] Using proxy URL:`, proxyUrl);
+      setDynamicStreamUrl(proxyUrl);
 
-        // Try to play music in background (optional, non-blocking)
-        if (musicAudioRef.current && ambientMusicUrl) {
-          musicAudioRef.current.play().then(() => {
-            console.log('Music stream playing successfully');
-          }).catch((musicError) => {
-            console.warn('Music stream failed to play:', musicError);
-            // Music is optional, so we don't throw here
-          });
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Не удалось загрузить поток';
-        setError(errorMessage);
-        console.error('Error loading stream:', err);
-        setIsLoading(false);
-      }
-    } else {
-      // Use existing URL (either dynamic or static)
-      try {
-        if (atcAudioRef.current) {
+      // Wait a moment for the audio element to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Play ATC stream (critical)
+      if (atcAudioRef.current) {
+        console.log(`[${airport.code}] Setting audio source to proxy:`, proxyUrl);
+        atcAudioRef.current.src = proxyUrl;
+        atcAudioRef.current.load(); // Explicitly load the stream
+
+        try {
           await atcAudioRef.current.play();
+          console.log(`[${airport.code}] ATC stream playing successfully`);
+
           // Set playing state immediately after ATC starts
           setIsPlaying(true);
-          setActiveStream(code);
+          setActiveStream(airport.code);
+          setIsLoading(false);
+        } catch (playError) {
+          console.error(`[${airport.code}] Error playing ATC stream:`, playError);
+          throw new Error(`Ошибка воспроизведения: ${playError instanceof Error ? playError.message : 'Неизвестная ошибка'}`);
         }
-
-        // Try to play music in background (optional, non-blocking)
-        if (musicAudioRef.current && ambientMusicUrl) {
-          musicAudioRef.current.play().catch((musicError) => {
-            console.warn('Music stream failed to play:', musicError);
-          });
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Ошибка воспроизведения';
-        setError(errorMessage);
-        console.error('Error playing stream:', err);
       }
+
+      // Try to play music in background (optional, non-blocking)
+      if (musicAudioRef.current && airport.ambientMusicUrl) {
+        musicAudioRef.current.src = airport.ambientMusicUrl;
+        musicAudioRef.current.load();
+        musicAudioRef.current.play().then(() => {
+          console.log(`[${airport.code}] Music stream playing successfully`);
+        }).catch((musicError) => {
+          console.warn(`[${airport.code}] Music stream failed to play:`, musicError);
+          // Music is optional, so we don't throw here
+        });
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Не удалось загрузить поток';
+      setError(errorMessage);
+      console.error(`[${airport.code}] Error loading stream:`, err);
+      setIsLoading(false);
     }
   };
 
@@ -259,6 +283,39 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
     musicAudioRef.current?.pause();
     setIsPlaying(false);
     setActiveStream(null);
+  };
+
+  // Handle airport change with auto-switching (Variant 1C)
+  const handleAirportChange = async (airport: AirportConfig) => {
+    console.log(`[Airport Change] From ${selectedAirport.code} to ${airport.code}`);
+
+    // Close dropdown
+    setIsDropdownOpen(false);
+
+    // If currently playing - auto-switch to new airport
+    if (isPlaying) {
+      console.log(`[Airport Change] Auto-switching stream to ${airport.code}`);
+
+      // Stop current streams
+      atcAudioRef.current?.pause();
+      musicAudioRef.current?.pause();
+
+      // Reset stream URL to force reload
+      setDynamicStreamUrl(null);
+      setError(null);
+
+      // Update selected airport in context BEFORE playing
+      setSelectedAirport(airport);
+
+      // Small delay for cleanup
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Start new stream automatically with the new airport
+      await handlePlay(airport);
+    } else {
+      // If not playing - just update the selection
+      setSelectedAirport(airport);
+    }
   };
 
   // Expose play/pause methods to parent via ref
@@ -288,17 +345,95 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
           />
         </div>
 
-        <h3 className="mb-2 sm:mb-3 text-center text-xl sm:text-2xl font-bold text-foreground">
-          {code}
-        </h3>
+        {/* Airport Selector - Minimal Apple Style */}
+        <div className="mb-2 relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            disabled={isLoading || !isLoaded}
+            className={`group w-full text-center transition-all ${
+              isLoading || !isLoaded ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+            }`}
+          >
+            {/* Airport Code with Chevron */}
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <h3 className={`text-xl sm:text-2xl font-bold text-foreground transition-colors ${
+                !isLoading && isLoaded ? 'group-hover:text-primary' : ''
+              }`}>
+                {isLoaded ? selectedAirport.code : '...'}
+              </h3>
+              <ChevronDown
+                className={`h-4 w-4 text-muted/60 transition-all ${
+                  isDropdownOpen ? 'rotate-180 text-primary' : 'group-hover:text-primary'
+                }`}
+                strokeWidth={2}
+              />
+            </div>
 
-        <p className="mb-2 text-center text-sm sm:text-base text-muted">
-          {city}
-        </p>
+            {/* City Name */}
+            <p className="text-sm sm:text-base text-muted">
+              {isLoaded ? selectedAirport.city : 'Загрузка...'}
+            </p>
+
+            {/* Subtle underline on hover */}
+            <div className={`h-px mx-auto mt-2 bg-gradient-to-r from-transparent via-primary/40 to-transparent transition-all ${
+              !isLoading && isLoaded ? 'w-0 group-hover:w-24' : 'w-0'
+            }`} />
+          </button>
+
+          {/* Dropdown Menu - Clean Apple Style */}
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 z-50 w-[280px] rounded-2xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-2xl shadow-black/10 overflow-hidden"
+              >
+                <div className="p-2">
+                  {AIRPORTS.map((airport, index) => (
+                    <button
+                      key={airport.code}
+                      onClick={() => handleAirportChange(airport)}
+                      disabled={isLoading}
+                      className={`w-full px-3 py-2.5 text-left transition-all flex items-center justify-between rounded-lg ${
+                        airport.code === selectedAirport.code
+                          ? 'bg-primary/8'
+                          : 'hover:bg-background/50'
+                      } ${isLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+                    >
+                      <div className="flex-1">
+                        <div className={`font-semibold text-sm ${
+                          airport.code === selectedAirport.code ? 'text-primary' : 'text-foreground'
+                        }`}>
+                          {airport.code}
+                        </div>
+                        <div className="text-xs text-muted/70 mt-0.5">{airport.city}</div>
+                      </div>
+                      {airport.code === selectedAirport.code && (
+                        <svg
+                          className="h-4 w-4 text-primary"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2.5}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Radio Frequency - Always visible */}
-        <div className="mb-3 sm:mb-4 text-center">
-          <span className="font-mono text-xs font-semibold text-primary">118.1 MHz</span>
+        <div className="mb-4 text-center">
+          <span className="font-mono text-xs font-semibold text-primary tracking-wider">
+            {isLoaded ? selectedAirport.frequency : '...'}
+          </span>
         </div>
 
         {/* Live message when playing */}
@@ -432,20 +567,25 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
         )}
 
         {/* Weather Widget */}
-        <WeatherWidget show={isPlaying} />
+        <WeatherWidget show={isPlaying && isLoaded} icao={isLoaded ? selectedAirport.code : 'ULLI'} />
 
         {/* Play/Pause Button - Bottom */}
         <div className="mt-4 sm:mt-6 flex justify-center">
           <button
-            onClick={isPlaying ? handlePause : handlePlay}
-            disabled={isLoading}
+            onClick={isPlaying ? handlePause : () => handlePlay()}
+            disabled={isLoading || !isLoaded}
             className={`group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-[10px] px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold transition-all ${
-              isLoading
+              isLoading || !isLoaded
                 ? 'cursor-not-allowed opacity-80 bg-primary/50'
                 : 'bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20'
             }`}
           >
-            {isLoading ? (
+            {!isLoaded ? (
+              <>
+                Загрузка...
+                <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2} />
+              </>
+            ) : isLoading ? (
               <>
                 Подключение...
                 <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2} />
@@ -483,18 +623,14 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ code, ci
       {/* Hidden Audio Elements */}
       <audio
         ref={atcAudioRef}
-        src={dynamicStreamUrl || atcStreamUrl}
         preload="none"
         crossOrigin="anonymous"
       />
-      {ambientMusicUrl && (
-        <audio
-          ref={musicAudioRef}
-          src={ambientMusicUrl}
-          loop
-          preload="none"
-        />
-      )}
+      <audio
+        ref={musicAudioRef}
+        loop
+        preload="none"
+      />
     </div>
   );
 });

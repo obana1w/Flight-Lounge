@@ -17,13 +17,13 @@ interface MetarData {
   sunset?: string;
 }
 
-export function WeatherWidget({ show }: { show: boolean }) {
+export function WeatherWidget({ show, icao }: { show: boolean; icao: string }) {
   const [metar, setMetar] = useState<MetarData | null>(null);
   const [loading, setLoading] = useState(false);
 
   const fetchMetar = () => {
     setLoading(true);
-    fetch('/api/weather')
+    fetch(`/api/weather?icao=${icao}`)
       .then(res => res.json())
       .then(data => {
         setMetar(data);
@@ -40,17 +40,17 @@ export function WeatherWidget({ show }: { show: boolean }) {
       // Initial fetch
       fetchMetar();
 
-      // Update every 10 minutes (600000ms)
+      // Update every 5 minutes (300000ms)
       const interval = setInterval(() => {
         fetchMetar();
-      }, 600000);
+      }, 300000);
 
       return () => clearInterval(interval);
     } else {
       // Reset when hidden
       setMetar(null);
     }
-  }, [show]);
+  }, [show, icao]); // Added icao to dependencies
 
   const formatTime = (isoTime: string) => {
     const date = new Date(isoTime);
@@ -91,7 +91,7 @@ export function WeatherWidget({ show }: { show: boolean }) {
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <Cloud className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary/70" strokeWidth={1.5} />
                 <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider text-muted/70">
-                  METAR ULLI
+                  METAR {icao}
                 </span>
               </div>
               {metar.reportTime && (

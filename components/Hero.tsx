@@ -106,12 +106,8 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
             <div className="w-full lg:w-96">
               <StreamCard
                 ref={streamCardRef}
-                code="ULLI"
-                city="Санкт-Петербург (Пулково)"
                 listeners={0}
                 isLive={true}
-                radioScannerCode="ulli"
-                ambientMusicUrl="https://ice3.somafm.com/fluid-128-mp3"
               />
             </div>
           </motion.div>
