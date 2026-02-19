@@ -100,7 +100,7 @@ export function RadioModal({ isOpen, onClose }: RadioModalProps) {
                 maxHeight: '90vh',
                 overflow: 'auto',
               }}
-              className="rounded-xl sm:rounded-2xl lg:rounded-3xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-2xl"
+              className="rounded-xl sm:rounded-2xl lg:rounded-3xl border border-border/30 bg-card/80 backdrop-blur-xl shadow-2xl"
             >
               {/* Close button */}
               <button

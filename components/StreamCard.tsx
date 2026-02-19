@@ -328,7 +328,7 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl sm:rounded-3xl border bg-card transition-all duration-500 ${
+      className={`group relative overflow-hidden rounded-2xl sm:rounded-3xl border bg-card/30 backdrop-blur-xl transition-all duration-500 ${
         isLoading
           ? 'border-primary shadow-2xl shadow-primary/20 animate-pulse'
           : isPlaying

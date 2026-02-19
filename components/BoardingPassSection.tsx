@@ -25,7 +25,7 @@ export function BoardingPassSection({ onStartListening }: BoardingPassSectionPro
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="bg-card border border-border rounded-xl sm:rounded-2xl lg:rounded-3xl overflow-hidden shadow-2xl"
+          className="bg-card/30 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl lg:rounded-3xl overflow-hidden shadow-2xl"
         >
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
             {/* Main Section */}
@@ -127,9 +127,8 @@ export function BoardingPassSection({ onStartListening }: BoardingPassSectionPro
 
             {/* Stub Section */}
             <div
-              className="border-t-2 lg:border-t-0 lg:border-l-2 border-dashed p-6 sm:p-7 lg:p-8 flex flex-col items-center justify-center gap-3 sm:gap-4 text-center"
+              className="border-t-2 lg:border-t-0 lg:border-l-2 border-dashed p-6 sm:p-7 lg:p-8 flex flex-col items-center justify-center gap-3 sm:gap-4 text-center bg-card/30 backdrop-blur-xl"
               style={{
-                background: 'rgba(30, 41, 59, 0.3)',
                 borderColor: '#1E293B'
               }}
             >
