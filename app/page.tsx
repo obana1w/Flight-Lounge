@@ -25,6 +25,16 @@ export default function Home() {
     setIsContextModalOpen(false);
   };
 
+  const handleBoardingPassListening = async () => {
+    // If already playing — just scroll to stream card, don't restart
+    if (streamCardRef.current?.isPlaying) {
+      const heroSection = document.querySelector('section');
+      heroSection?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    await streamCardRef.current?.play();
+  };
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
@@ -59,60 +69,60 @@ export default function Home() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <div className="relative min-h-screen bg-background flex flex-col">
-        {/* Aurora Background */}
-        <Aurora
-          colorStops={["#0B1628", "#1E3A5F", "#3B5998"]}
-          blend={0.6}
-          amplitude={1.4}
-          speed={1.2}
-        />
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col flex-1">
-          <Header
-            onOpenRadioModal={() => setIsRadioModalOpen(true)}
+          {/* Aurora Background */}
+          <Aurora
+            colorStops={["#0B1628", "#1E3A5F", "#3B5998"]}
+            blend={0.6}
+            amplitude={1.4}
+            speed={1.2}
           />
 
-          <main className="flex-1">
-            {/* Hero Section */}
-            <section className="pt-6 pb-10 sm:pt-10 sm:pb-12 md:pt-14 md:pb-14 lg:pt-20 lg:pb-14 lg:min-h-[calc(100vh-160px)] flex items-start lg:items-center">
-              <Hero
-                streamCardRef={streamCardRef}
-                onOpenContextModal={() => setIsContextModalOpen(true)}
-                onOpenRadioModal={() => setIsRadioModalOpen(true)}
-              />
-            </section>
+          {/* Content */}
+          <div className="relative z-10 flex flex-col flex-1">
+            <Header
+              onOpenRadioModal={() => setIsRadioModalOpen(true)}
+            />
 
-            {/* Philosophy Section */}
-            <div id="philosophy">
-              <PhilosophySection />
-            </div>
+            <main className="flex-1">
+              {/* Hero Section */}
+              <section className="pt-6 pb-10 sm:pt-10 sm:pb-12 md:pt-14 md:pb-14 lg:pt-20 lg:pb-14 lg:min-h-[calc(100vh-160px)] flex items-start lg:items-center">
+                <Hero
+                  streamCardRef={streamCardRef}
+                  onOpenContextModal={() => setIsContextModalOpen(true)}
+                  onOpenRadioModal={() => setIsRadioModalOpen(true)}
+                />
+              </section>
 
-            {/* Features Section */}
-            <div id="features">
-              <FeaturesSection />
-            </div>
+              {/* Philosophy Section */}
+              <div id="philosophy">
+                <PhilosophySection />
+              </div>
 
-            {/* Weather Ribbon */}
-            <WeatherRibbon />
+              {/* Features Section */}
+              <div id="features">
+                <FeaturesSection />
+              </div>
 
-            {/* Boarding Pass Section */}
-            <BoardingPassSection onStartListening={handleStartListening} />
-          </main>
+              {/* Weather Ribbon */}
+              <WeatherRibbon />
 
-          <Footer onOpenRadioModal={() => setIsRadioModalOpen(true)} />
-        </div>
+              {/* Boarding Pass Section */}
+              <BoardingPassSection onStartListening={handleBoardingPassListening} />
+            </main>
 
-        {/* Modals */}
-        <ContextModal
-          isOpen={isContextModalOpen}
-          onClose={() => setIsContextModalOpen(false)}
-          onStartListening={handleStartListening}
-        />
-        <RadioModal
-          isOpen={isRadioModalOpen}
-          onClose={() => setIsRadioModalOpen(false)}
-        />
+            <Footer onOpenRadioModal={() => setIsRadioModalOpen(true)} />
+          </div>
+
+          {/* Modals */}
+          <ContextModal
+            isOpen={isContextModalOpen}
+            onClose={() => setIsContextModalOpen(false)}
+            onStartListening={handleStartListening}
+          />
+          <RadioModal
+            isOpen={isRadioModalOpen}
+            onClose={() => setIsRadioModalOpen(false)}
+          />
         </div>
       </AudioPlayerProvider>
     </AirportProvider>

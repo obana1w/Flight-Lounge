@@ -78,7 +78,7 @@ export function WeatherRibbon() {
             <div className="font-mono text-xl sm:text-2xl font-semibold tracking-[0.2em] sm:tracking-[0.25em]">
               {selectedAirport.code}
             </div>
-            <div className="font-mono text-[10px] sm:text-[11px] text-muted/70 max-w-full sm:max-w-[280px] lg:max-w-[300px] leading-[1.5] break-all sm:break-normal">
+            <div className="font-mono text-[10px] sm:text-[11px] text-muted/70 max-w-full sm:max-w-[280px] lg:max-w-[300px] leading-[1.5] break-all sm:break-normal text-center sm:text-left">
               {metar.raw}
             </div>
           </motion.div>

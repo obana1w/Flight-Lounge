@@ -43,7 +43,7 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
-                className="text-[15px] sm:text-base md:text-lg lg:text-[19px] text-muted/90 leading-[1.7]"
+                className="text-[15px] sm:text-base md:text-lg lg:text-[19px] text-muted-foreground leading-[1.7]"
               >
                 Медитация на частоте десяти тысяч метров. Голоса пилотов и диспетчеров в реальном времени — спокойно и глубоко.
               </motion.p>
@@ -55,7 +55,7 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.55, ease: "easeOut" }}
                 onClick={onOpenContextModal}
-                className="group inline-flex items-center justify-center gap-2.5 rounded-[10px] bg-gradient-to-br from-primary to-secondary px-6 sm:px-7 py-3 sm:py-[14px] text-[14px] sm:text-[15px] font-semibold text-white transition-all hover:-translate-y-0.5"
+                className="group cursor-pointer inline-flex items-center justify-center gap-2.5 rounded-[10px] bg-gradient-to-br from-primary to-secondary px-6 sm:px-7 py-3 sm:py-[14px] text-[14px] sm:text-[15px] font-semibold text-white transition-all hover:-translate-y-0.5"
                 style={{
                   boxShadow: '0 4px 20px rgba(59, 130, 246, 0.25)'
                 }}
@@ -75,7 +75,7 @@ export function Hero({ streamCardRef, onOpenContextModal, onOpenRadioModal }: He
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.65, ease: "easeOut" }}
                 onClick={onOpenRadioModal}
-                className="group inline-flex items-center justify-center gap-2.5 rounded-[10px] px-6 sm:px-7 py-3 sm:py-[14px] text-[14px] sm:text-[15px] font-semibold text-foreground transition-all"
+                className="group cursor-pointer inline-flex items-center justify-center gap-2.5 rounded-[10px] px-6 sm:px-7 py-3 sm:py-[14px] text-[14px] sm:text-[15px] font-semibold text-foreground transition-all"
                 style={{
                   background: 'rgba(20, 27, 45, 0.5)',
                   border: '1px solid rgba(30, 41, 59, 0.6)',

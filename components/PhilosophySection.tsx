@@ -24,7 +24,7 @@ export function PhilosophySection() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="mb-6 sm:mb-8"
         >
-          <h2 className="text-[11px] sm:text-xs lg:text-sm uppercase tracking-[0.25em] sm:tracking-[0.3em] text-muted/60 font-medium font-mono">
+          <h2 className="text-xs sm:text-sm lg:text-base uppercase tracking-[0.25em] sm:tracking-[0.3em] text-muted/60 font-medium font-mono">
             Философия
           </h2>
         </motion.div>
@@ -56,7 +56,7 @@ export function PhilosophySection() {
           className="space-y-5 sm:space-y-6 text-[14px] sm:text-[15px] lg:text-base leading-[1.9] text-muted-foreground font-light px-2 sm:px-0"
         >
           <p>
-          Мир движется быстро. Шум везде. Плейлисты, уведомления, бесконечный поток звука. А там, над облаками, говорят только когда нужно. Каждая фраза — решение. Мы соединяем живой авиационный эфир с мягким лаунж-звучанием, создавая пространство, где можно работать, думать и просто быть.
+            Мир движется быстро. Шум везде. Плейлисты, уведомления, бесконечный поток звука. А там, над облаками, говорят только когда нужно. Каждая фраза — решение. Мы соединяем живой авиационный эфир с мягким лаунж-звучанием, создавая пространство, где можно работать, думать и просто быть.
           </p>
         </motion.div>
 

@@ -24,8 +24,16 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
   const { selectedAirport, setSelectedAirport, isLoaded } = useAirport();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [atcVolume, setAtcVolume] = useState(70);
-  const [musicVolume, setMusicVolume] = useState(30);
+  const [atcVolume, setAtcVolume] = useState<number>(() => {
+    if (typeof window === 'undefined') return 70;
+    const stored = localStorage.getItem('flylounge_atc_volume');
+    return stored !== null ? Number(stored) : 70;
+  });
+  const [musicVolume, setMusicVolume] = useState<number>(() => {
+    if (typeof window === 'undefined') return 30;
+    const stored = localStorage.getItem('flylounge_music_volume');
+    return stored !== null ? Number(stored) : 30;
+  });
   const [dynamicStreamUrl, setDynamicStreamUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [liveListeners, setLiveListeners] = useState(0);
@@ -88,12 +96,14 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
     if (atcAudioRef.current) {
       atcAudioRef.current.volume = atcVolume / 100;
     }
+    localStorage.setItem('flylounge_atc_volume', String(atcVolume));
   }, [atcVolume]);
 
   useEffect(() => {
     if (musicAudioRef.current) {
       musicAudioRef.current.volume = musicVolume / 100;
     }
+    localStorage.setItem('flylounge_music_volume', String(musicVolume));
   }, [musicVolume]);
 
   // Auto-restart music if it stops
@@ -328,13 +338,12 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl sm:rounded-3xl border bg-card/30 backdrop-blur-xl transition-all duration-500 ${
-        isLoading
-          ? 'border-primary shadow-2xl shadow-primary/20 animate-pulse'
-          : isPlaying
+      className={`group relative overflow-hidden rounded-2xl sm:rounded-3xl border bg-card/30 backdrop-blur-xl transition-all duration-500 ${isLoading
+        ? 'border-primary shadow-2xl shadow-primary/20 animate-pulse'
+        : isPlaying
           ? 'border-primary shadow-2xl shadow-primary/20'
           : 'border-border hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-black/20'
-      }`}
+        }`}
     >
       <div className="relative p-6 sm:p-8 lg:p-10">
         <div className="mb-6 sm:mb-8 flex justify-center">
@@ -350,21 +359,18 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             disabled={isLoading || !isLoaded}
-            className={`group w-full text-center transition-all ${
-              isLoading || !isLoaded ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
-            }`}
+            className={`group w-full text-center transition-all ${isLoading || !isLoaded ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+              }`}
           >
             {/* Airport Code with Chevron */}
             <div className="flex items-center justify-center gap-2 mb-1">
-              <h3 className={`text-xl sm:text-2xl font-bold text-foreground transition-colors ${
-                !isLoading && isLoaded ? 'group-hover:text-primary' : ''
-              }`}>
+              <h3 className={`text-xl sm:text-2xl font-bold text-foreground transition-colors ${!isLoading && isLoaded ? 'group-hover:text-primary' : ''
+                }`}>
                 {isLoaded ? selectedAirport.code : '...'}
               </h3>
               <ChevronDown
-                className={`h-4 w-4 text-muted/60 transition-all ${
-                  isDropdownOpen ? 'rotate-180 text-primary' : 'group-hover:text-primary'
-                }`}
+                className={`h-4 w-4 text-muted/60 transition-all ${isDropdownOpen ? 'rotate-180 text-primary' : 'group-hover:text-primary'
+                  }`}
                 strokeWidth={2}
               />
             </div>
@@ -375,9 +381,8 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
             </p>
 
             {/* Subtle underline on hover */}
-            <div className={`h-px mx-auto mt-2 bg-gradient-to-r from-transparent via-primary/40 to-transparent transition-all ${
-              !isLoading && isLoaded ? 'w-0 group-hover:w-24' : 'w-0'
-            }`} />
+            <div className={`h-px mx-auto mt-2 bg-gradient-to-r from-transparent via-primary/40 to-transparent transition-all ${!isLoading && isLoaded ? 'w-0 group-hover:w-24' : 'w-0'
+              }`} />
           </button>
 
           {/* Dropdown Menu - Clean Apple Style */}
@@ -396,16 +401,14 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
                       key={airport.code}
                       onClick={() => handleAirportChange(airport)}
                       disabled={isLoading}
-                      className={`w-full px-3 py-2.5 text-left transition-all flex items-center justify-between rounded-lg ${
-                        airport.code === selectedAirport.code
-                          ? 'bg-primary/8'
-                          : 'hover:bg-background/50'
-                      } ${isLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+                      className={`w-full px-3 py-2.5 text-left transition-all flex items-center justify-between rounded-lg ${airport.code === selectedAirport.code
+                        ? 'bg-primary/8'
+                        : 'hover:bg-background/50'
+                        } ${isLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
                     >
                       <div className="flex-1">
-                        <div className={`font-semibold text-sm ${
-                          airport.code === selectedAirport.code ? 'text-primary' : 'text-foreground'
-                        }`}>
+                        <div className={`font-semibold text-sm ${airport.code === selectedAirport.code ? 'text-primary' : 'text-foreground'
+                          }`}>
                           {airport.code}
                         </div>
                         <div className="text-xs text-muted/70 mt-0.5">{airport.city}</div>
@@ -455,7 +458,7 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
         <div className="mb-6 flex items-center justify-between text-sm">
           <div className="flex items-center gap-2 text-muted">
             <Circle className={`h-2 w-2 fill-current ${liveListeners > 0 ? 'text-success animate-pulse' : ''}`}
-                    style={liveListeners > 0 ? { animationDuration: '2s' } : {}} />
+              style={liveListeners > 0 ? { animationDuration: '2s' } : {}} />
             <span>{liveListeners}</span>
           </div>
 
@@ -474,19 +477,16 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
             <div className="mb-1.5 flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Volume2
-                  className={`h-3.5 w-3.5 transition-all duration-300 ${
-                    isPlaying ? 'text-primary' : 'text-muted/40'
-                  }`}
+                  className={`h-4 w-4 transition-all duration-300 ${isPlaying ? 'text-primary' : 'text-muted/40'
+                    }`}
                 />
-                <span className={`text-xs font-medium transition-all duration-300 ${
-                  isPlaying ? 'text-foreground' : 'text-muted/40'
-                }`}>
+                <span className={`text-xs font-medium transition-all duration-300 ${isPlaying ? 'text-foreground' : 'text-muted/40'
+                  }`}>
                   ATC
                 </span>
               </div>
-              <span className={`font-mono text-[10px] transition-all duration-300 ${
-                isPlaying ? 'text-muted' : 'text-muted/40'
-              }`}>
+              <span className={`font-mono text-[11px] transition-all duration-300 ${isPlaying ? 'text-muted' : 'text-muted/40'
+                }`}>
                 {atcVolume}%
               </span>
             </div>
@@ -497,11 +497,10 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
               value={atcVolume}
               onChange={(e) => setAtcVolume(Number(e.target.value))}
               disabled={!isPlaying}
-              className={`h-1.5 w-full appearance-none rounded-full outline-none transition-all duration-300 ${
-                isPlaying
-                  ? 'cursor-pointer [&::-webkit-slider-thumb]:hover:scale-125'
-                  : 'cursor-not-allowed opacity-50'
-              } [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:shadow-primary/30 [&::-webkit-slider-thumb]:transition-transform`}
+              className={`h-1.5 w-full appearance-none rounded-full outline-none transition-all duration-300 ${isPlaying
+                ? 'cursor-ew-resize [&::-webkit-slider-thumb]:hover:scale-125'
+                : 'cursor-not-allowed opacity-50'
+                } [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:shadow-primary/30 [&::-webkit-slider-thumb]:transition-transform`}
               style={{
                 background: isPlaying
                   ? `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${atcVolume}%, #1E293B ${atcVolume}%, #1E293B 100%)`
@@ -515,19 +514,16 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
             <div className="mb-1.5 flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Music
-                  className={`h-3.5 w-3.5 transition-all duration-300 ${
-                    isPlaying ? 'text-secondary' : 'text-muted/40'
-                  }`}
+                  className={`h-4 w-4 transition-all duration-300 ${isPlaying ? 'text-secondary' : 'text-muted/40'
+                    }`}
                 />
-                <span className={`text-xs font-medium transition-all duration-300 ${
-                  isPlaying ? 'text-foreground' : 'text-muted/40'
-                }`}>
+                <span className={`text-xs font-medium transition-all duration-300 ${isPlaying ? 'text-foreground' : 'text-muted/40'
+                  }`}>
                   Music
                 </span>
               </div>
-              <span className={`font-mono text-[10px] transition-all duration-300 ${
-                isPlaying ? 'text-muted' : 'text-muted/40'
-              }`}>
+              <span className={`font-mono text-[11px] transition-all duration-300 ${isPlaying ? 'text-muted' : 'text-muted/40'
+                }`}>
                 {musicVolume}%
               </span>
             </div>
@@ -538,11 +534,10 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
               value={musicVolume}
               onChange={(e) => setMusicVolume(Number(e.target.value))}
               disabled={!isPlaying}
-              className={`h-1.5 w-full appearance-none rounded-full outline-none transition-all duration-300 ${
-                isPlaying
-                  ? 'cursor-pointer [&::-webkit-slider-thumb]:hover:scale-125'
-                  : 'cursor-not-allowed opacity-50'
-              } [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-secondary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:shadow-secondary/30 [&::-webkit-slider-thumb]:transition-transform`}
+              className={`h-1.5 w-full appearance-none rounded-full outline-none transition-all duration-300 ${isPlaying
+                ? 'cursor-ew-resize [&::-webkit-slider-thumb]:hover:scale-125'
+                : 'cursor-not-allowed opacity-50'
+                } [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-secondary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:shadow-secondary/30 [&::-webkit-slider-thumb]:transition-transform`}
               style={{
                 background: isPlaying
                   ? `linear-gradient(to right, #6366F1 0%, #6366F1 ${musicVolume}%, #1E293B ${musicVolume}%, #1E293B 100%)`
@@ -574,11 +569,10 @@ export const StreamCard = forwardRef<StreamCardRef, StreamCardProps>(({ listener
           <button
             onClick={isPlaying ? handlePause : () => handlePlay()}
             disabled={isLoading || !isLoaded}
-            className={`group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-[10px] px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold transition-all ${
-              isLoading || !isLoaded
-                ? 'cursor-not-allowed opacity-80 bg-primary/50'
-                : 'bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20'
-            }`}
+            className={`group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-[10px] px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold transition-all ${isLoading || !isLoaded
+              ? 'cursor-not-allowed opacity-80 bg-primary/50'
+              : 'cursor-pointer bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20'
+              }`}
           >
             {!isLoaded ? (
               <>
